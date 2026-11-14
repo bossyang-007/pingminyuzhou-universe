@@ -2,6 +2,7 @@
 // 字段见 src/content/schema.md；geo/real/future 为「现实—未来」平行映射扩展字段。
 // 本场景把杭州市 13 个区县按真实经纬度投影到一张星图平面（北为 -z），与真实空间一一映射。
 import { SCENE_REGISTRY } from './registry.js';
+import { HZ_STATE } from './hangzhou.state.js';
 
 // 13 个区县的真实质心经纬度（约值），投影到 16×16 的星图平面：
 //   x = (lng - 119.05) / 1.37 * 16 - 8 ;  z = -(lat - 29.48) / 0.94 * 16 + 8  （北→远处 -z）
@@ -23,14 +24,31 @@ const DISTRICTS = [
 const projX = (lng) => ((lng - 119.05) / 1.37) * 16 - 8;
 const projZ = (lat) => -((lat - 29.48) / 0.94) * 16 + 8;
 
-// 每个区县一支「光柱信标」：高度随常住人口缩放，颜色区分，顶部发光球代表该区数字孪生节点
+// 状态同步：读取定时任务写出的 HZ_STATE，把模拟脉搏映射到星图（无状态则回退静态基线）
+const HZ = HZ_STATE && HZ_STATE.districts ? HZ_STATE : null;
+const hzPop = (id) => (HZ && HZ.districts[id] && HZ.districts[id].pop) || null;
+const hzMood = (id) => (HZ && HZ.districts[id] && HZ.districts[id].mood) || null;
+let coreEmissive = '#7fdcff';
+if (HZ) {
+  const ps = Object.values(HZ.districts).map((d) => d.prosperity || 60);
+  const avgPros = ps.reduce((a, b) => a + b, 0) / ps.length;
+  coreEmissive = avgPros >= 75 ? '#9ff0ff' : avgPros >= 60 ? '#7fdcff' : '#3a7f9f';
+  const alert = (HZ.anomalies || []).some((a) => a.status === 'active'); // 异常活跃→中枢红色脉冲
+  if (alert) coreEmissive = '#ff6b6b';
+}
+
+// 每个区县一支「光柱信标」：高度随实时人口缩放，顶部发光球代表该区数字孪生节点；
+// 情绪低于阈值时顶部节点转橙，提示该区需关注
 const beaconProps = DISTRICTS.flatMap((d) => {
   const x = +projX(d.lng).toFixed(2);
   const z = +projZ(d.lat).toFixed(2);
-  const h = +(2 + d.pop * 0.06).toFixed(1);
+  const livePop = hzPop(d.id) != null ? hzPop(d.id) : d.pop;
+  const h = +(2 + livePop * 0.06).toFixed(1);
+  const mood = hzMood(d.id);
+  const topColor = mood != null && mood < 55 ? '#ff8a5a' : d.color;
   return [
     { type: 'cyl', pos: [x, h / 2, z], size: [0.35, h], color: d.color, emissive: d.color },
-    { type: 'sphere', pos: [x, h + 0.5, z], size: [0.7], color: d.color, emissive: d.color },
+    { type: 'sphere', pos: [x, h + 0.5, z], size: [0.7], color: topColor, emissive: topColor },
   ];
 });
 
@@ -57,9 +75,9 @@ SCENE_REGISTRY.push({
     // 星图连线底盘：一条贯穿南北的钱塘江光带 + 一条东西大运河光带
     { type: 'box', pos: [0, 0.12, -2], size: [0.3, 0.06, 14], color: '#2b6cff', emissive: '#2b6cff' },
     { type: 'box', pos: [-1, 0.12, 1], size: [11, 0.06, 0.3], color: '#39c6ff', emissive: '#39c6ff' },
-    // 城市中枢：城市大脑演化体
-    { type: 'cyl', pos: [0, 9, 0], size: [0.9, 18], color: '#9fe8ff', emissive: '#39c6ff' },
-    { type: 'sphere', pos: [0, 18.8, 0], size: [1.6], color: '#bff0ff', emissive: '#7fdcff' },
+    // 城市中枢：城市大脑演化体（亮度随繁荣、异常时转红脉冲）
+    { type: 'cyl', pos: [0, 9, 0], size: [0.9, 18], color: '#9fe8ff', emissive: coreEmissive },
+    { type: 'sphere', pos: [0, 18.8, 0], size: [1.6], color: '#bff0ff', emissive: coreEmissive },
     ...beaconProps,
   ],
   spots: [
