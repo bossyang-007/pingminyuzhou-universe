@@ -1,0 +1,13 @@
+{
+  "name": "pingmin-yuzhou",
+  "version": "2.0.0",
+  "description": "平民宇宙 · 内容驱动的 3D 人生模拟元宇宙（开源协作版）",
+  "type": "module",
+  "scripts": {
+    "dev": "node tools/serve.mjs",
+    "god": "node tools/creator-god/generate.mjs",
+    "build": "node tools/build.mjs"
+  },
+  "license": "MIT",
+  "repository": ""
+}

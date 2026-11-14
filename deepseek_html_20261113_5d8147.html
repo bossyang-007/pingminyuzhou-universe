@@ -1,0 +1,2186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#f4f0e6">
+<title>杭州一日 · 平民宇宙 (丝滑操作)</title>
+<style>
+:root{
+  --ink:#241f1b; --ink-soft:#5c524a;
+  --paper:#f4f0e6; --paper-2:#efe8da;
+  --red:#c8402f; --green:#4a7c59; --gold:#c9962e;
+  --line:rgba(36,31,27,.16);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;height:100%;}
+body{
+  background:#2a2724;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color:var(--ink); overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+button{font-family:inherit;color:inherit;border:none;background:none;cursor:pointer;}
+.hidden{display:none !important;}
+
+#app{
+  position:relative;
+  width:100%;max-width:390px;height:100dvh;max-height:844px;
+  background:var(--paper); overflow:hidden;
+  box-shadow:0 0 60px rgba(0,0,0,.5);
+  display:flex;flex-direction:column;
+}
+@media (min-width:860px) and (orientation:landscape){
+  #app{max-width:1180px;max-height:760px;border-radius:14px;}
+}
+
+/* 通用 UI */
+.screen{
+  position:absolute;inset:0; display:flex;flex-direction:column;
+  padding:24px 20px; background:var(--paper); overflow-y:auto;
+  z-index:20; animation:fadeIn .3s ease;
+}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.ticket{
+  position:relative;background:var(--paper-2);
+  border:2px solid var(--ink);border-radius:8px;
+  box-shadow:0 4px 0 rgba(36,31,27,.85);
+}
+
+/* 加载 */
+#loading{justify-content:center;align-items:center;gap:22px;text-align:center;}
+.logo-mark{font-size:12px;letter-spacing:.42em;color:var(--ink-soft);text-indent:.42em;}
+.logo-title{font-size:36px;font-weight:800;letter-spacing:.06em;line-height:1.1;}
+.logo-title small{display:block;font-size:12px;font-weight:500;letter-spacing:.3em;color:var(--ink-soft);margin-top:10px;}
+.bar{width:190px;height:8px;border:2px solid var(--ink);border-radius:99px;overflow:hidden;background:var(--paper-2);}
+.bar i{display:block;height:100%;width:0%;background:var(--red);transition:width .12s linear;}
+.load-tip{font-size:12px;color:var(--ink-soft);letter-spacing:.08em;min-height:16px;}
+
+/* 装扮 */
+#dressup{gap:16px;}
+.sec-title{font-size:22px;font-weight:800;letter-spacing:.06em;margin:6px 0 0;}
+.sec-sub{font-size:12px;color:var(--ink-soft);letter-spacing:.14em;margin:2px 0 6px;}
+.skin-list{display:flex;flex-direction:column;gap:12px;}
+.skin-card{
+  display:flex;align-items:center;gap:14px; padding:12px 14px;
+  background:var(--paper-2);border:2px solid var(--ink);border-radius:10px;
+  box-shadow:0 3px 0 var(--ink); transition:transform .08s;
+}
+.skin-card:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink);}
+.skin-card.on{background:#fff3d6;box-shadow:0 3px 0 var(--ink),0 0 0 3px rgba(200,64,47,.25);}
+.skin-prev{width:64px;height:80px;flex:none;position:relative;transform:scale(.95);display:grid;place-items:center;font-size:36px;}
+.skin-info{flex:1;}
+.skin-name{font-size:16px;font-weight:800;letter-spacing:.06em;}
+.skin-desc{font-size:11.5px;color:var(--ink-soft);line-height:1.6;margin-top:4px;}
+
+/* 按钮 */
+.btn{
+  border:2px solid var(--ink);border-radius:10px;
+  background:var(--red);color:#fff;
+  font-size:15px;font-weight:800;letter-spacing:.18em;
+  padding:14px 18px;width:100%;
+  box-shadow:0 4px 0 var(--ink); text-indent:.18em;
+}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--ink);}
+.btn.ghost{background:var(--paper-2);color:var(--ink);}
+.btn:disabled{opacity:.45;pointer-events:none;}
+
+/* 出生签 */
+#sign{justify-content:center;gap:16px;}
+.sign-head{text-align:center;}
+.sign-head .k{font-size:11px;letter-spacing:.4em;color:var(--ink-soft);text-indent:.4em;}
+.sign-head h2{margin:6px 0 0;font-size:22px;letter-spacing:.08em;}
+.sign-card{padding:18px 16px 20px;}
+.sign-origin{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.sign-origin .ico{width:46px;height:46px;flex:none;border-radius:12px;border:2px solid var(--ink);display:grid;place-items:center;font-size:23px;background:#fff;}
+.sign-origin .nm{font-size:19px;font-weight:800;letter-spacing:.06em;}
+.sign-origin .sub{font-size:11px;color:var(--ink-soft);letter-spacing:.16em;margin-top:3px;}
+.sign-row{display:flex;align-items:baseline;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+.sign-row:last-of-type{border-bottom:0;}
+.sign-row .lab{color:var(--ink-soft);letter-spacing:.1em;}
+.sign-row .val{font-weight:700;}
+.sign-desc{margin-top:12px;padding-top:12px;border-top:2px dashed var(--line);font-size:12.5px;line-height:1.7;color:var(--ink-soft);}
+
+/* 游戏 */
+#game{padding:0;overflow:hidden;}
+.hud{
+  flex:none;display:flex;align-items:center;justify-content:space-between;
+  padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
+  border-bottom:2px solid var(--ink); background:var(--paper-2);
+  font-size:12px; gap:6px; flex-wrap:wrap; z-index:10;
+}
+.hud .grp{display:flex;align-items:center;gap:6px;}
+.chip{
+  border:1.5px solid var(--ink);border-radius:99px;
+  padding:3px 9px;font-weight:700;letter-spacing:.04em;
+  background:var(--paper);font-variant-numeric:tabular-nums;
+  font-size:11.5px;
+}
+.chip.coin{background:#fff3d6;}
+
+/* 3D 舞台 */
+.stage{position:relative;flex:1 1 auto;min-height:0;overflow:hidden;background:#dfe9ee;}
+#webgl{position:absolute;top:0;left:0;width:100%;height:100%;outline:none;}
+.stage-fade{position:absolute;inset:0;background:#241f1b;opacity:0;pointer-events:none;transition:opacity .5s ease;z-index:15;}
+.stage-fade.on{opacity:1;}
+.fade-text {
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:20px;font-weight:800;letter-spacing:.2em;
+  opacity:0;transition:opacity .5s;z-index:16;pointer-events:none;
+}
+.fade-text.on {opacity:1;}
+
+/* 小地图与传送 */
+.map-panel {
+  position: absolute; top: 12px; left: 12px; z-index: 17;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.minimap {
+  width: 80px; height: 80px;
+  background: rgba(244,240,230,.85);
+  border: 2px solid var(--ink); border-radius: 50%;
+  box-shadow: 0 3px 0 var(--ink);
+  overflow: hidden; backdrop-filter: blur(4px);
+}
+#minimapCanvas { width: 100%; height: 100%; display: block; }
+
+.teleport-btn {
+  width: 80px; padding: 6px 0; text-align: center;
+  background: rgba(244,240,230,.9);
+  border: 2px solid var(--ink); border-radius: 99px;
+  box-shadow: 0 2px 0 var(--ink);
+  font-size: 11px; font-weight: 800; letter-spacing: .1em;
+  cursor: pointer;
+}
+.teleport-btn:active { transform: translateY(2px); box-shadow: 0 0 0 var(--ink); }
+
+/* 传送弹窗 */
+#teleportModal {
+  position: absolute; inset: 0; z-index: 35; background: rgba(36,31,27,.6);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+#teleportModal.on { opacity: 1; pointer-events: auto; }
+.teleport-box {
+  width: 100%; max-width: 320px; background: var(--paper);
+  border: 3px solid var(--ink); border-radius: 12px; box-shadow: 0 6px 0 var(--ink);
+  padding: 20px; display: flex; flex-direction: column; gap: 12px;
+}
+.teleport-title { font-size: 18px; font-weight: 800; text-align: center; letter-spacing: .1em; margin-bottom: 8px; }
+.teleport-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tp-item {
+  border: 2px solid var(--ink); border-radius: 8px; padding: 10px;
+  background: var(--paper-2); font-size: 13px; font-weight: 700;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  box-shadow: 0 2px 0 var(--ink); cursor: pointer;
+}
+.tp-item:active { transform: translateY(2px); box-shadow: 0 0 0 var(--ink); }
+.tp-item .icon { font-size: 20px; }
+
+.scene-tag{
+  position:absolute;left:12px;top:12px;z-index:7;
+  font-size:11px;letter-spacing:.28em;font-weight:700;
+  padding:5px 10px;border-radius:99px;
+  background:rgba(244,240,230,.9);border:1.5px solid var(--ink);
+  opacity:0;transition:opacity .5s;text-indent:.28em;pointer-events:none;
+}
+.bubble{
+  position:absolute;left:50%;bottom:120px;transform:translateX(-50%) translateY(10px);
+  z-index:14;max-width:220px;padding:9px 12px;
+  font-size:12.5px;line-height:1.55;
+  background:#fffdf6;border:2px solid var(--ink);border-radius:10px;
+  box-shadow:0 3px 0 rgba(36,31,27,.8);
+  opacity:0;transition:opacity .18s, transform .18s;
+  pointer-events:none; text-align:center;
+}
+.bubble.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* 交互一行字提示 */
+.interact-bar {
+  position:absolute; left:50%; top: 12px; transform:translateX(-50%);
+  z-index:14; padding:6px 16px; border-radius:99px;
+  background:rgba(244,240,230,.95); color:var(--ink);
+  font-size:12px; font-weight:700; border:2px solid var(--ink);
+  box-shadow:0 3px 0 rgba(36,31,27,.8);
+  opacity:0; transition:opacity .2s, top .2s; pointer-events:none;
+  white-space:nowrap; display:flex; align-items:center; gap:6px;
+}
+.interact-bar.on { opacity:1; top: 16px; }
+.interact-bar.clickable { pointer-events:auto; cursor:pointer; background:var(--red); color:#fff; }
+.interact-bar.clickable:active { transform:translateX(-50%) translateY(2px); box-shadow:0 1px 0 rgba(36,31,27,.8); }
+
+/* 王者荣耀摇杆 */
+.joystick-area {
+  position: absolute; left: 20px; bottom: 20px; width: 130px; height: 130px;
+  z-index: 16; border-radius: 50%;
+  background: rgba(36,31,27,0.1);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  border: 2px solid rgba(36,31,27,0.15);
+  touch-action: none;
+}
+.joystick-base {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 110px; height: 110px; border-radius: 50%;
+  background: rgba(244,240,230,0.6);
+  border: 2px solid rgba(36,31,27,0.5);
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+}
+.joystick-stick {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 50px; height: 50px; border-radius: 50%;
+  background: rgba(200,64,47,0.85);
+  border: 2px solid var(--ink);
+  box-shadow: 0 4px 0 rgba(36,31,27,0.8);
+  transition: transform 0.05s;
+}
+.joystick-stick.active {
+  background: rgba(200,64,47,1);
+  box-shadow: 0 2px 0 rgba(36,31,27,0.8);
+}
+
+/* Toast */
+#toast{
+  position:absolute;left:50%;bottom:100px;transform:translateX(-50%) translateY(10px);
+  background:rgba(36,31,27,.92);color:#fff;
+  font-size:12.5px;padding:9px 16px;border-radius:99px;
+  z-index:40;opacity:0;pointer-events:none;transition:.25s;
+  max-width:80%;text-align:center;line-height:1.5;
+}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* 事件抉择模态框 */
+#eventModal {
+  position:absolute;inset:0;z-index:30;background:rgba(36,31,27,.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+#eventModal.on {opacity:1;pointer-events:auto;}
+.event-box {
+  width:100%;max-width:320px;background:var(--paper);
+  border:3px solid var(--ink);border-radius:12px;box-shadow:0 6px 0 var(--ink);
+  padding:20px;display:flex;flex-direction:column;gap:12px;
+}
+.event-title {font-size:18px;font-weight:800;text-align:center;letter-spacing:.1em;}
+.event-desc {font-size:13px;line-height:1.6;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+.event-choices {display:flex;flex-direction:column;gap:8px;}
+.choice-btn {
+  border:2px solid var(--ink);border-radius:8px;padding:10px 12px;
+  background:var(--paper-2);font-size:13px;font-weight:700;text-align:left;
+  box-shadow:0 3px 0 var(--ink);
+}
+.choice-btn:active {transform:translateY(2px);box-shadow:0 1px 0 var(--ink);}
+
+/* 夜市 */
+#shop,#haggle{gap:12px;}
+.shop-head{display:flex;align-items:center;justify-content:space-between;}
+.shop-head h2{margin:0;font-size:19px;font-weight:800;letter-spacing:.06em;}
+.shop-head .money{font-size:13px;font-weight:800;color:var(--red);}
+.goods-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;padding-bottom:8px;}
+.good-card{
+  background:var(--paper-2);border:2px solid var(--ink);border-radius:9px;
+  padding:9px 10px;display:flex;flex-direction:column;gap:3px;
+}
+.good-ico{font-size:22px;line-height:1;}
+.good-name{font-size:12.5px;font-weight:800;letter-spacing:.03em;}
+.good-price{font-size:10.5px;color:var(--ink-soft);}
+.good-hot{font-size:10px;color:var(--gold);letter-spacing:.06em;}
+.qty{display:flex;align-items:center;gap:6px;margin-top:4px;}
+.qty button{
+  width:24px;height:24px;border:1.5px solid var(--ink);border-radius:6px;
+  background:var(--paper);font-size:14px;font-weight:800;line-height:1;
+  display:grid;place-items:center;
+}
+.qty button:active{transform:translateY(1px);}
+.qty span{min-width:18px;text-align:center;font-weight:800;font-size:13px;}
+.cart-bar{
+  flex:none;position:sticky;bottom:0;background:var(--paper);
+  padding:10px 0 4px;display:flex;flex-direction:column;gap:8px;
+  border-top:2px dashed var(--line);
+}
+.cart-info{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;}
+.cart-info .warn{color:var(--red);}
+
+/* 议价 */
+.haggle-card{padding:18px 16px;display:flex;flex-direction:column;gap:12px;text-align:center;}
+.customer{font-size:36px;line-height:1;}
+.customer-name{font-size:14px;font-weight:800;letter-spacing:.06em;}
+.customer-want{font-size:12.5px;color:var(--ink-soft);line-height:1.6;}
+.strat-list{display:flex;flex-direction:column;gap:9px;}
+.strat-btn{
+  border:2px solid var(--ink);border-radius:10px;
+  background:var(--paper-2);padding:12px 14px;text-align:left;
+  box-shadow:0 3px 0 var(--ink);
+}
+.strat-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink);}
+.strat-btn .st{font-size:14px;font-weight:800;letter-spacing:.05em;}
+.strat-btn .sd{font-size:11px;color:var(--ink-soft);margin-top:3px;line-height:1.5;}
+.round-tip{font-size:11px;color:var(--ink-soft);letter-spacing:.12em;text-align:center;}
+
+/* 结算 */
+.settle-rows{display:flex;flex-direction:column;gap:0;}
+.settle-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+.settle-row:last-child{border-bottom:0;}
+.settle-row .v{font-weight:800;font-variant-numeric:tabular-nums;}
+.settle-row.total{font-size:15px;padding-top:12px;}
+.settle-row.total .v{color:var(--red);}
+
+/* 日报 */
+#report{gap:14px;justify-content:flex-start;}
+.rep-head{text-align:center;padding:8px 0;}
+.rep-head .d{font-size:11px;letter-spacing:.4em;color:var(--ink-soft);text-indent:.4em;}
+.rep-head h2{margin:6px 0 0;font-size:24px;font-weight:800;letter-spacing:.08em;}
+.rep-card{padding:16px;}
+.rep-line{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+.rep-line:last-child{border-bottom:0;}
+.rep-line .v{font-weight:800;}
+.rep-line .v.pos{color:var(--green);}
+.rep-line .v.neg{color:var(--red);}
+.rep-log{font-size:12px;color:var(--ink-soft);line-height:1.7;max-height:120px;overflow-y:auto;margin-top:8px;}
+.rep-log div{padding:3px 0;border-bottom:1px dotted var(--line);}
+
+/* 分享图 */
+#share{justify-content:center;align-items:center;gap:16px;}
+.share-card{
+  width:100%;max-width:300px;padding:22px 20px;
+  background:linear-gradient(160deg,#fffdf6,#f4ecdd);
+  border:3px solid var(--ink);border-radius:14px;
+  box-shadow:0 6px 0 var(--ink);
+  text-align:center;
+}
+.share-card .sc-tag{font-size:10px;letter-spacing:.36em;color:var(--ink-soft);text-indent:.36em;}
+.share-card .sc-day{font-size:13px;font-weight:800;letter-spacing:.2em;margin-top:6px;}
+.share-card .sc-main{font-size:34px;font-weight:800;margin:12px 0 4px;letter-spacing:.02em;color:var(--red);}
+.share-card .sc-sub{font-size:12px;color:var(--ink-soft);letter-spacing:.08em;}
+.share-card .sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;text-align:left;}
+.share-card .sc-cell{background:rgba(255,255,255,.6);border:1.5px solid var(--ink);border-radius:8px;padding:7px 9px;}
+.share-card .sc-cell .k{font-size:9.5px;color:var(--ink-soft);letter-spacing:.1em;}
+.share-card .sc-cell .v{font-size:14px;font-weight:800;margin-top:2px;}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important;transition:none !important;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- 加载 -->
+<div class="screen" id="loading">
+  <div class="logo-mark">CITY · HANGZHOU</div>
+  <div class="logo-title">杭州一日<small>出 生 都 是 平 民</small></div>
+  <div class="bar"><i id="loadBar"></i></div>
+  <div class="load-tip" id="loadTip">正在铺开杭州的街道…</div>
+</div>
+
+<!-- 装扮 -->
+<div class="screen hidden" id="dressup">
+  <div class="sec-title">选一身行头</div>
+  <div class="sec-sub">SKIN · 决定你今天的气质</div>
+  <div class="skin-list" id="skinList"></div>
+  <div style="flex:1"></div>
+  <button class="btn" id="btnSkin">确 定 出 门</button>
+</div>
+
+<!-- 出生签 -->
+<div class="screen hidden" id="sign">
+  <div class="sign-head">
+    <div class="k">签 · 第 一 日</div>
+    <h2>你的出身</h2>
+  </div>
+  <div class="ticket sign-card">
+    <div class="sign-origin">
+      <div class="ico" id="signIco">🏠</div>
+      <div>
+        <div class="nm" id="signName">浙里原生</div>
+        <div class="sub" id="signSub">NATIVE</div>
+      </div>
+    </div>
+    <div class="sign-row"><span class="lab">房　　租</span><span class="val" id="signRent">—</span></div>
+    <div class="sign-row"><span class="lab">初始资金</span><span class="val" id="signMoney">—</span></div>
+    <div class="sign-row"><span class="lab">体　　力</span><span class="val" id="signStam">—</span></div>
+    <div class="sign-desc" id="signDesc">—</div>
+  </div>
+  <button class="btn" id="btnStart">开 始 今 天</button>
+</div>
+
+<!-- 游戏 -->
+<div class="screen hidden" id="game">
+  <div class="hud">
+    <div class="grp">
+      <span class="chip" id="hudDay">DAY 1</span>
+      <span class="chip" id="hudTime">08:00</span>
+    </div>
+    <div class="grp">
+      <span class="chip coin" id="hudCoin">￥0</span>
+      <span class="chip" id="hudStam">⚡100</span>
+      <span class="chip" id="hudRep">★0</span>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <canvas id="webgl"></canvas>
+    
+    <div class="map-panel">
+      <div class="minimap" id="minimap">
+        <canvas id="minimapCanvas" width="80" height="80"></canvas>
+      </div>
+      <button class="teleport-btn" id="btnTeleport">传送 🚀</button>
+    </div>
+
+    <div class="scene-tag" id="sceneTag">出租屋</div>
+    <div class="bubble" id="bubble">…</div>
+    
+    <!-- 交互栏 -->
+    <div class="interact-bar" id="interactBar"></div>
+
+    <!-- 摇杆 -->
+    <div class="joystick-area" id="joystickArea">
+      <div class="joystick-base"></div>
+      <div class="joystick-stick" id="joystickStick"></div>
+    </div>
+
+    <div class="stage-fade" id="stageFade"></div>
+    <div class="fade-text" id="fadeText"></div>
+  </div>
+</div>
+
+<!-- 传送 Modal -->
+<div id="teleportModal">
+  <div class="teleport-box">
+    <div class="teleport-title">去哪里？</div>
+    <div class="teleport-list" id="teleportList"></div>
+    <button class="btn ghost" id="btnTpClose" style="margin-top:8px;">取 消</button>
+  </div>
+</div>
+
+<!-- 事件抉择 Modal -->
+<div id="eventModal">
+  <div class="event-box">
+    <div class="event-title" id="evTitle">事件</div>
+    <div class="event-desc" id="evDesc">描述</div>
+    <div class="event-choices" id="evChoices"></div>
+  </div>
+</div>
+
+<!-- 夜市进货 -->
+<div class="screen hidden" id="shop">
+  <div class="shop-head">
+    <h2>河坊街 · 选品</h2>
+    <div class="money" id="shopMoney">￥0</div>
+  </div>
+  <div class="round-tip">选好货，摆开摊。最多选 4 种，别把本钱压死。</div>
+  <div class="goods-grid" id="goodsGrid"></div>
+  <div class="cart-bar">
+    <div class="cart-info">
+      <span id="cartCount">已选 0 件</span>
+      <span id="cartCost">成本 ￥0</span>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn ghost" id="btnShopBack" style="flex:1">再想想</button>
+      <button class="btn" id="btnOpenStall" style="flex:1.6">开 摊</button>
+    </div>
+  </div>
+</div>
+
+<!-- 议价 -->
+<div class="screen hidden" id="haggle">
+  <div class="shop-head">
+    <h2>议价</h2>
+    <div class="money" id="haggleStock">库存 0</div>
+  </div>
+  <div class="round-tip" id="roundTip">第 1 / 3 位顾客</div>
+  <div class="ticket haggle-card">
+    <div class="customer" id="custIcon">🧑</div>
+    <div class="customer-name" id="custName">顾客</div>
+    <div class="customer-want" id="custWant">想买点东西</div>
+  </div>
+  <div class="strat-list" id="stratList"></div>
+</div>
+
+<!-- 日报 -->
+<div class="screen hidden" id="report">
+  <div class="rep-head">
+    <div class="d" id="repDay">DAY · 1</div>
+    <h2>今日日报</h2>
+  </div>
+  <div class="ticket rep-card" id="repCard"></div>
+  <button class="btn" id="btnShare">生 成 分 享 图</button>
+</div>
+
+<!-- 分享图 -->
+<div class="screen hidden" id="share">
+  <div class="share-card" id="shareCard"></div>
+  <div style="display:flex;gap:8px;width:100%;max-width:300px;">
+    <button class="btn ghost" id="btnAgain" style="flex:1">再 来 一 天</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+</div>
+
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script>
+window.onerror = function(msg, src, line) {
+  const tip = document.getElementById('loadTip');
+  if (tip) tip.innerHTML = "加载出错，请刷新: " + msg + " (line " + line + ")";
+  alert("游戏出错了，请检查控制台报错: " + msg + " (line " + line + ")");
+};
+
+(function(){
+"use strict";
+
+const $ = id => document.getElementById(id);
+const rand = (a,b) => a + Math.random()*(b-a);
+const randInt = (a,b) => Math.floor(rand(a,b+1));
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const clamp = (v,a,b) => Math.max(a, Math.min(b,v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const fmtTime = m => `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
+const money = n => '￥' + Math.round(n);
+
+let toastTimer = 0;
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('on'), 1900);
+}
+
+/* ============ 音效系统 ============ */
+const AudioSys = {
+  ctx: null,
+  init() {
+    if (!this.ctx) {
+      try {
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      } catch(e) {}
+    }
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  play(type) {
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      const now = this.ctx.currentTime;
+
+      if (type === 'step') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(80, now + 0.1);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc.start(now); osc.stop(now + 0.1);
+      } else if (type === 'coin') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.setValueAtTime(1320, now + 0.1);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now); osc.stop(now + 0.3);
+      } else if (type === 'event') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(600, now + 0.2);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now); osc.stop(now + 0.2);
+      } else if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1000, now);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+        osc.start(now); osc.stop(now + 0.05);
+      } else if (type === 'door') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.exponentialRampToValueAtTime(400, now + 0.2);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+        osc.start(now); osc.stop(now + 0.4);
+      }
+    } catch(e) {}
+  }
+};
+window.addEventListener('pointerdown', () => AudioSys.init(), { once: true });
+document.querySelectorAll('.btn, .act-btn, .choice-btn, .strat-btn').forEach(el => {
+  el.addEventListener('pointerdown', () => AudioSys.play('click'));
+});
+
+/* ============ 数据 ============ */
+const SKINS = [
+  { id:'commute', name:'日常通勤', icon:'🎒', desc:'体力消耗 -10%，初始体力 110。',
+    bonus:{ staminaMax:10, staminaCost:0.9 }, color:{ body:0x5c6a7a, hair:0x2b2320, pants:0x2a303d, pack:0x8a6a4a } },
+  { id:'hanfu', name:'汉服少年', icon:'🏮', desc:'口碑 +10，摆摊单价 +8%。',
+    bonus:{ rep:10, stallPrice:1.08 }, color:{ body:0x3a6b5c, hair:0x1f1a17, pants:0x2f5045, pack:0x000000 } },
+  { id:'street', name:'街头潮人', icon:'🕶', desc:'人脉 +15，议价销量 +10%。',
+    bonus:{ network:15, haggleVolume:1.1 }, color:{ body:0xd04a38, hair:0x1a1512, pants:0x1f1a18, pack:0x000000 } }
+];
+
+const ORIGINS = [
+  { id:'native', icon:'🏠', name:'浙里原生', sub:'NATIVE · 老底子', rent:0, hasRent:false, coin:800, desc:'和爸妈住在拱墅老小区，家里不交租。' },
+  { id:'grad', icon:'🎓', name:'杭漂应届生', sub:'GRAD · 城西合租', rent:120, hasRent:true, coin:600, desc:'刚毕业来的杭州，合租在城西。' },
+  { id:'vendor', icon:'🏮', name:'夜市摊主之子', sub:'VENDOR · 河坊街', rent:80, hasRent:true, coin:900, desc:'从小在河坊街长大，进货有门路。' },
+  { id:'boatman', icon:'⛵', name:'西湖船工后代', sub:'BOATMAN · 湖畔', rent:100, hasRent:true, coin:700, desc:'爷爷在西湖摇橹船，水性好。' },
+  { id:'alibaba', icon:'💻', name:'阿里外包仔', sub:'OUTSOURCE · 西溪', rent:150, hasRent:true, coin:1200, desc:'在西溪园区上班，人脉广。' },
+  { id:'tea', icon:'🍵', name:'龙井茶农后代', sub:'TEA · 梅家坞', rent:0, hasRent:false, coin:650, desc:'梅家坞茶农，手里有半亩茶园。' }
+];
+
+const LANDMARKS = {
+  home:     { id:'home', name:'出租屋', color:0x8fa8c0, pos:[0, 0], action:'rest', label:'休息一下', icon:'🛏️' },
+  westlake: { id:'westlake', name:'西湖边', color:0x86b18f, pos:[-300, -300], action:'walk', label:'沿湖散步', icon:'🚶' },
+  hefang:   { id:'hefang', name:'河坊街', color:0xaa7355, pos:[200, -200], action:'stall', label:'摆开摊子', icon:'🏮' },
+  campus:   { id:'campus', name:'西溪园区', color:0x8fa8c0, pos:[300, 200], action:'work', label:'进楼打工', icon:'💻' },
+  metro:    { id:'metro', name:'地铁站', color:0xaeb4ba, pos:[-200, 200], action:'transfer', label:'换乘地铁', icon:'🚇' }
+};
+
+const GOODS = [
+  { id:'g1', icon:'🥟', name:'葱包桧', cost:2, price:6, hot:4 },
+  { id:'g2', icon:'🍡', name:'定胜糕', cost:3, price:8, hot:5 },
+  { id:'g3', icon:'🍵', name:'龙井茶罐', cost:8, price:20, hot:3 },
+  { id:'g4', icon:'🌂', name:'油纸伞', cost:12, price:35, hot:2 },
+  { id:'g5', icon:'🍭', name:'糖画', cost:1, price:5, hot:5 },
+  { id:'g6', icon:'🥣', name:'西湖藕粉', cost:4, price:12, hot:4 },
+  { id:'g7', icon:'🧣', name:'丝绸手帕', cost:6, price:18, hot:3 },
+  { id:'g8', icon:'✂️', name:'张小泉剪刀', cost:9, price:25, hot:2 },
+  { id:'g9', icon:'🍰', name:'桂花糕', cost:2, price:7, hot:5 },
+  { id:'g10', icon:'🧺', name:'竹编小篮', cost:5, price:15, hot:3 },
+  { id:'g11', icon:'🪭', name:'王星记扇子', cost:7, price:22, hot:3 },
+  { id:'g12', icon:'🫖', name:'龙井茶包', cost:3, price:10, hot:4 }
+];
+
+const RANDOM_EVENTS = [
+  { title:'突如其来的大雨', desc:'忽然下起大雨，你没带伞，浑身湿透。', 
+    choices: [
+      { text:'花 20 块买把伞', eff:{ coin:-20, stamina:-2 }, res:'买了一把印着断桥的油纸伞，勉强没感冒。' },
+      { text:'咬牙淋雨跑回去', eff:{ stamina:-15 }, res:'淋成落汤鸡，第二天大概会感冒。' }
+    ] 
+  },
+  { title:'路边的片儿川', desc:'一股香气飘来，是正宗的片儿川小馆。', 
+    choices: [
+      { text:'吃一碗 (花 15 块)', eff:{ coin:-15, stamina:+20 }, res:'热汤下肚，浑身暖洋洋的。' },
+      { text:'忍住，继续赶路', eff:{ stamina:-5 }, res:'肚子咕咕叫，脚步更沉重了。' }
+    ] 
+  },
+  { title:'阿里的内推机会', desc:'碰到一个穿工牌的老同学，说西溪有个内推名额。', 
+    choices: [
+      { text:'请他喝杯咖啡 (花 30)', eff:{ coin:-30, network:+15, rep:+5 }, res:'相谈甚欢，人脉大涨。' },
+      { text:'谢谢，下次一定', eff:{}, res:'错过了一个可能的机会。' }
+    ] 
+  }
+];
+
+/* ============ 状态 ============ */
+const G = {
+  skin: null, origin: null, day: 1, time: 8*60,
+  coin: 0, stamina: 100, staminaMax: 100, rep: 0, network: 0,
+  started: false, log: [], stall: null, rentPaid: false,
+  actionState: 'idle', // idle, going_to_bed, sleeping, going_to_sofa, watching_tv, going_to_fridge, fridge_open
+  actionTimer: 0,
+  actionTimeout: null,
+  tvScreen: null, tvCanvas: null, tvCtx: null, tvTexture: null,
+  fridgeDoor: null, fridgeLight: null, fridgeScreen: null, fridgeCanvas: null, fridgeCtx: null, fridgeTexture: null,
+  roomba: null, roombaTarget: new THREE.Vector3(),
+  moveTarget: null, // 点击寻路的目标点
+  currentInteract: null // 当前正在交互的物体
+};
+const joystick = { active: false, baseX: 0, baseY: 0, moveX: 0, moveY: 0 };
+
+/* ============ Three.js 初始化 ============ */
+const canvas = $('webgl');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.5, 2000);
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+// 光照系统
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambientLight);
+
+const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+sunLight.position.set(100, 150, 100);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.width = 1024;
+sunLight.shadow.mapSize.height = 1024;
+sunLight.shadow.camera.near = 1;
+sunLight.shadow.camera.far = 500;
+sunLight.shadow.camera.left = -100;
+sunLight.shadow.camera.right = 100;
+sunLight.shadow.camera.top = 100;
+sunLight.shadow.camera.bottom = -100;
+sunLight.shadow.bias = -0.0005;
+scene.add(sunLight);
+
+let avatar = null;
+let walkTime = 0;
+let stepTimer = 0;
+
+let activeLandmark = null;
+let isNearInteract = false;
+let cooldownInteract = false;
+let colliders = [];
+let interactables = [];
+
+/* ============ 射线拾取 (Click to move) ============ */
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+/* ============ 辅助构建函数 ============ */
+const H = {
+  box(parent, w, h, d, color, x, y, z, isCollider = false) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color }));
+    m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; parent.add(m);
+    if (isCollider) colliders.push({ x, z, w: w/2, d: d/2, minY: y - h/2, maxY: y + h/2 });
+    return m;
+  },
+  cyl(parent, rt, rb, h, color, x, y, z, seg=12, isCollider = false) {
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), new THREE.MeshLambertMaterial({ color }));
+    m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; parent.add(m);
+    if (isCollider) colliders.push({ x, z, r: Math.max(rt, rb), minY: y - h/2, maxY: y + h/2 });
+    return m;
+  },
+  sphere(parent, r, color, x, y, z, seg=16, isCollider = false) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(r, seg, seg), new THREE.MeshLambertMaterial({ color }));
+    m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; parent.add(m);
+    if (isCollider) colliders.push({ x, z, r, minY: y - r, maxY: y + r });
+    return m;
+  },
+  cone(parent, r, h, color, x, y, z) {
+    const m = new THREE.Mesh(new THREE.ConeGeometry(r, h, 8), new THREE.MeshLambertMaterial({ color }));
+    m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+  }
+};
+
+function checkCollision(x, z) {
+  const margin = 1.5;
+  for (let c of colliders) {
+    if (c.w !== undefined) {
+      if (x + margin > c.x - c.w && x - margin < c.x + c.w &&
+          z + margin > c.z - c.d && z - margin < c.z + c.d) {
+        return true;
+      }
+    }
+    if (c.r !== undefined) {
+      const dist = Math.hypot(x - c.x, z - c.z);
+      if (dist < c.r + margin) return true;
+    }
+  }
+  return false;
+}
+
+/* ============ 精致小人 ============ */
+function createAvatar(skin) {
+  const g = new THREE.Group();
+  
+  const matSkin = new THREE.MeshLambertMaterial({ color: 0xf8dcc1 });
+  const matHair = new THREE.MeshLambertMaterial({ color: skin.color.hair });
+  const matBody = new THREE.MeshLambertMaterial({ color: skin.color.body });
+  const matPants = new THREE.MeshLambertMaterial({ color: skin.color.pants });
+  const matEye = new THREE.MeshBasicMaterial({ color: 0x1a1512 });
+  const matEyeHighlight = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  const matBlush = new THREE.MeshLambertMaterial({ color: 0xf0997f, transparent: true, opacity: 0.6 });
+
+  const legGeo = new THREE.CylinderGeometry(0.28, 0.22, 0.7, 8);
+  legGeo.translate(0, -0.35, 0);
+  const legL = new THREE.Mesh(legGeo, matPants);
+  legL.position.set(-0.35, 0.8, 0); legL.castShadow = true; g.add(legL);
+  const legR = new THREE.Mesh(legGeo.clone(), matPants);
+  legR.position.set(0.35, 0.8, 0); legR.castShadow = true; g.add(legR);
+  
+  const shoeL = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 8), matPants);
+  shoeL.position.set(0, -0.35, 0.1); shoeL.scale.set(1, 0.5, 1.5); legL.add(shoeL);
+  const shoeR = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 8), matPants);
+  shoeR.position.set(0, -0.35, 0.1); shoeR.scale.set(1, 0.5, 1.5); legR.add(shoeR);
+
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.8, 1.5, 16), matBody);
+  body.position.y = 1.6; body.castShadow = true; g.add(body);
+  
+  const hem = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, 0.3, 16), matBody);
+  hem.position.y = 0.9; g.add(hem);
+  
+  const armGeo = new THREE.CylinderGeometry(0.22, 0.18, 0.8, 8);
+  armGeo.translate(0, -0.4, 0);
+  const armL = new THREE.Mesh(armGeo, matBody);
+  armL.position.set(-0.8, 2.0, 0); armL.castShadow = true; g.add(armL);
+  const armR = new THREE.Mesh(armGeo.clone(), matBody);
+  armR.position.set(0.8, 2.0, 0); armR.castShadow = true; g.add(armR);
+  
+  const handL = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), matSkin);
+  handL.position.set(0, -0.4, 0); armL.add(handL);
+  const handR = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), matSkin);
+  handR.position.set(0, -0.4, 0); armR.add(handR);
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(1.2, 32, 32), matSkin);
+  head.position.y = 3.4; head.castShadow = true; g.add(head);
+  
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(1.28, 32, 32, 0, Math.PI*2, 0, Math.PI/2), matHair);
+  hair.position.y = 3.4; g.add(hair);
+  
+  const bangL = new THREE.Mesh(new THREE.SphereGeometry(0.45, 16, 16), matHair);
+  bangL.position.set(-0.75, 3.3, 0.75); bangL.scale.set(1, 1.5, 0.5); g.add(bangL);
+  const bangR = new THREE.Mesh(new THREE.SphereGeometry(0.45, 16, 16), matHair);
+  bangR.position.set(0.75, 3.3, 0.75); bangR.scale.set(1, 1.5, 0.5); g.add(bangR);
+  
+  const ahoge = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.9), matHair);
+  ahoge.position.set(0, 4.7, 0); ahoge.rotation.z = 0.2; g.add(ahoge);
+  
+  const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.2, 12, 12), matEye);
+  eyeL.position.set(-0.4, 3.4, 1.1); eyeL.scale.set(0.8, 1.2, 0.5); g.add(eyeL);
+  const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.2, 12, 12), matEye);
+  eyeR.position.set(0.4, 3.4, 1.1); eyeR.scale.set(0.8, 1.2, 0.5); g.add(eyeR);
+  
+  const hlL = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), matEyeHighlight);
+  hlL.position.set(-0.45, 3.5, 1.2); g.add(hlL);
+  const hlR = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), matEyeHighlight);
+  hlR.position.set(0.35, 3.5, 1.2); g.add(hlR);
+  
+  const cheekL = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), matBlush);
+  cheekL.position.set(-0.7, 3.2, 1.0); cheekL.scale.set(1, 0.4, 0.2); g.add(cheekL);
+  const cheekR = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), matBlush);
+  cheekR.position.set(0.7, 3.2, 1.0); cheekR.scale.set(1, 0.4, 0.2); g.add(cheekR);
+  
+  const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.1, 0.03, 4, 8, Math.PI), matEye);
+  mouth.position.set(0, 3.0, 1.15); mouth.rotation.x = Math.PI; g.add(mouth);
+
+  if (skin.id === 'commute') {
+    H.box(g, 0.9, 1.1, 0.5, skin.color.pack, 0, 1.9, 0.7);
+    const scarf = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.15, 8, 16), new THREE.MeshLambertMaterial({ color: 0xc9962e }));
+    scarf.position.y = 2.5; scarf.rotation.x = Math.PI/2; g.add(scarf);
+  } else if (skin.id === 'hanfu') {
+    const bun = new THREE.Mesh(new THREE.SphereGeometry(0.45, 8, 8), matHair);
+    bun.position.set(0, 4.6, -0.2); g.add(bun);
+    H.box(g, 0.25, 1.8, 0.1, 0xc8402f, -0.45, 1.3, 0.8);
+    H.box(g, 0.25, 1.8, 0.1, 0xc8402f, 0.45, 1.3, 0.8);
+  } else if (skin.id === 'street') {
+    H.cyl(g, 1.2, 1.2, 0.35, 0x1d1a18, 0, 4.4, 0);
+    H.box(g, 1.2, 0.1, 0.7, 0x1d1a18, 0, 4.3, 1.0);
+    H.box(g, 1.3, 0.28, 0.2, 0x161311, 0, 3.4, 1.2);
+  }
+
+  g.userData = { armL, armR, legL, legR, ahoge, hair };
+  return g;
+}
+
+/* ============ 构建独立场景 ============ */
+let mapGroup = null;
+let currentSceneId = 'home';
+let groundMesh = null; // 用于射线检测
+
+function buildScene(sceneId) {
+  if (mapGroup) scene.remove(mapGroup);
+  mapGroup = new THREE.Group();
+  scene.add(mapGroup);
+  colliders = [];
+  interactables = [];
+  currentSceneId = sceneId;
+  
+  // 清理上一场景的引用
+  G.tvScreen = null;
+  G.tvCanvas = null;
+  G.tvCtx = null;
+  G.tvTexture = null;
+  G.fridgeDoor = null;
+  G.fridgeLight = null;
+  G.fridgeScreen = null;
+  G.fridgeCanvas = null;
+  G.fridgeCtx = null;
+  G.fridgeTexture = null;
+  G.roomba = null;
+
+  const groundGeo = new THREE.PlaneGeometry(200, 200);
+  const groundMat = new THREE.MeshLambertMaterial({ color: 0xcdd8d0 });
+  groundMesh = new THREE.Mesh(groundGeo, groundMat);
+  groundMesh.rotation.x = -Math.PI/2;
+  groundMesh.receiveShadow = true;
+  mapGroup.add(groundMesh);
+
+  switch(sceneId) {
+    case 'home': buildHome(); break;
+    case 'westlake': buildWestlake(); break;
+    case 'hefang': buildHefang(); break;
+    case 'campus': buildCampus(); break;
+    case 'metro': buildMetro(); break;
+    default: buildHome();
+  }
+}
+
+// 室内出租屋
+function buildHome() {
+  // 木地板
+  H.box(mapGroup, 30, 0.2, 30, 0xd2b48c, 0, 0.1, 0);
+  // 地毯
+  H.box(mapGroup, 12, 0.05, 10, 0x8b4513, 0, 0.22, 0);
+
+  // 四面墙壁 (高度 2，绝对不挡视线)
+  H.box(mapGroup, 30, 2, 1, 0xf4f0e6, 0, 1, -15, true); // 后墙
+  H.box(mapGroup, 30, 2, 1, 0xf4f0e6, 0, 1, 15, true);  // 前墙
+  H.box(mapGroup, 1, 2, 30, 0xf4f0e6, -15, 1, 0, true); // 左墙
+  H.box(mapGroup, 1, 2, 30, 0xf4f0e6, 15, 1, 0, true);  // 右墙
+
+  // 窗户
+  H.box(mapGroup, 10, 3, 0.2, 0x9cc5d9, 0, 3, -15.6);
+  H.box(mapGroup, 10, 0.5, 0.5, 0x8a7a6a, 0, 4.5, -15);
+  H.box(mapGroup, 10, 0.5, 0.5, 0x8a7a6a, 0, 1.5, -15);
+
+  // 床
+  H.box(mapGroup, 8, 1.5, 12, 0x5c4033, -10, 0.75, -8, true);
+  H.box(mapGroup, 7.5, 1, 11, 0xffffff, -10, 1.75, -8);
+  H.box(mapGroup, 7.5, 0.4, 3, 0x4682b4, -10, 2.05, -12);
+  H.box(mapGroup, 5, 1, 2, 0xeeeeee, -10, 2.05, -3);
+
+  // 沙发与茶几
+  H.box(mapGroup, 12, 2, 6, 0x708090, 8, 1, 8, true);
+  H.box(mapGroup, 12, 4, 1, 0x708090, 8, 2, 11, true);
+  H.box(mapGroup, 1, 3, 5, 0x708090, 2, 1.5, 8, true);
+  H.box(mapGroup, 1, 3, 5, 0x708090, 14, 1.5, 8, true);
+  H.box(mapGroup, 6, 0.5, 4, 0x8b6b4a, 8, 1, 4, true);
+
+  // 电视柜与电视
+  H.box(mapGroup, 12, 2, 2, 0x2a2a2a, 0, 1, -13.5, true);
+  H.box(mapGroup, 10, 6, 0.5, 0x111111, 0, 4, -14);
+  
+  // 电视屏幕 (动态)
+  G.tvCanvas = document.createElement('canvas');
+  G.tvCanvas.width = 256;
+  G.tvCanvas.height = 256;
+  G.tvCtx = G.tvCanvas.getContext('2d');
+  G.tvTexture = new THREE.CanvasTexture(G.tvCanvas);
+  G.tvScreen = H.box(mapGroup, 9.5, 5.5, 0.2, 0xffffff, 0, 4, -13.8);
+  G.tvScreen.material.map = G.tvTexture;
+  G.tvScreen.material.needsUpdate = true;
+
+  // 书桌与电脑
+  H.box(mapGroup, 8, 2, 4, 0x8b6b4a, 10, 1, -8, true);
+  H.box(mapGroup, 3, 3, 0.2, 0x333333, 10, 3.5, -9);
+  H.box(mapGroup, 2.5, 2, 0.1, 0x2b5c8a, 10, 3.5, -8.9);
+
+  // 饮水机
+  H.box(mapGroup, 3, 6, 3, 0xe0f0f0, 8, 3, -12, true);
+  H.cyl(mapGroup, 1.2, 1.2, 2, 0x88ccff, 8, 7, -12);
+  interactables.push({ id: 'water', mesh: null, x: 8, z: -10, label: '接杯水喝', action: 'drink', icon: '🚰' });
+
+  // 扫地机器人
+  G.roomba = new THREE.Group();
+  G.roomba.position.set(0, 0.3, 0);
+  mapGroup.add(G.roomba);
+  H.cyl(G.roomba, 1, 1, 0.4, 0x444444, 0, 0.2, 0);
+  H.cyl(G.roomba, 0.8, 0.8, 0.1, 0x222222, 0, 0.4, 0);
+  
+  // === 智能冰箱 ===
+  H.box(mapGroup, 5, 10, 5, 0xe0e0e0, -12, 5, 8, true);
+  G.fridgeLight = new THREE.PointLight(0x88ff88, 0.5, 10);
+  G.fridgeLight.position.set(-12, 5, 5);
+  G.fridgeLight.visible = false;
+  mapGroup.add(G.fridgeLight);
+
+  G.fridgeDoor = new THREE.Group();
+  G.fridgeDoor.position.set(-12, 5, 10.5); 
+  mapGroup.add(G.fridgeDoor);
+  H.box(G.fridgeDoor, 4.8, 9.8, 0.4, 0xf0f0f0, 0, 0, -0.2);
+  H.box(G.fridgeDoor, 0.3, 2, 0.2, 0xaaaaaa, 2, 0, 0.1);
+  
+  G.fridgeCanvas = document.createElement('canvas');
+  G.fridgeCanvas.width = 128;
+  G.fridgeCanvas.height = 128;
+  G.fridgeCtx = G.fridgeCanvas.getContext('2d');
+  G.fridgeTexture = new THREE.CanvasTexture(G.fridgeCanvas);
+  G.fridgeScreen = H.box(G.fridgeDoor, 2.5, 2.5, 0.1, 0x111111, 0, 2, 0.01);
+  G.fridgeScreen.material.map = G.fridgeTexture;
+  G.fridgeScreen.material.needsUpdate = true;
+
+  // 交互点
+  interactables.push({ id: 'bed', mesh: null, x: -10, z: -4, label: '躺下睡觉', action: 'sleep', icon: '🛏️' });
+  interactables.push({ id: 'tv', mesh: null, x: 0, z: -10, label: '坐下看电视', action: 'watch_tv', icon: '📺' });
+  interactables.push({ id: 'pc', mesh: null, x: 10, z: -8, label: '用电脑加班', action: 'work', icon: '💻' });
+  interactables.push({ id: 'fridge', mesh: null, x: -12, z: 4, label: '打开智能冰箱', action: 'open_fridge', icon: '🧊' });
+}
+
+// 室外场景
+function buildWestlake() {
+  const waterGeo = new THREE.PlaneGeometry(200, 200);
+  const waterMat = new THREE.MeshPhongMaterial({ color: 0x6a9aaa, shininess: 120, transparent: true, opacity: 0.9 });
+  const water = new THREE.Mesh(waterGeo, waterMat);
+  water.rotation.x = -Math.PI/2; water.position.set(30, 0.2, 0); water.receiveShadow = true; mapGroup.add(water);
+  
+  H.box(mapGroup, 80, 1, 30, 0xbfb39e, -20, 0.5, 0, true);
+  for(let i=-35; i<=35; i+=5) {
+    H.cyl(mapGroup, 0.3, 0.4, 2, 0xaaaaaa, i, 2, -10, 8);
+  }
+  H.box(mapGroup, 80, 0.2, 0.5, 0xaaaaaa, 0, 3, -10);
+
+  const bridge = new THREE.Group(); bridge.position.set(-20, 0, -30); mapGroup.add(bridge);
+  H.box(bridge, 24, 1.5, 10, 0xd6cfc0, 0, 4, 0, true);
+  H.cyl(bridge, 8, 8, 8, 0xd6cfc0, 0, 0.5, 0).rotation.z = Math.PI/2;
+
+  for(let i=-30; i<=30; i+=15) {
+    H.cyl(mapGroup, 1, 1.5, 12, 0x5c4033, -40, 6, i, 8, true);
+    for(let j=0;j<6;j++) {
+      const bx = -40 + rand(-4,4);
+      const bz = i + rand(-4,4);
+      H.cyl(mapGroup, 0.1, 0.05, 8, 0x6b8e23, bx, 10, bz);
+      H.sphere(mapGroup, 2.5, 0x6b8e23, bx, 14, bz).scale.set(1, 0.4, 1);
+    }
+  }
+  const pavilion = H.cyl(mapGroup, 4, 4, 3, 0xd9443a, 20, 1.5, 20);
+  H.cone(mapGroup, 6, 4, 0x2a2a2a, 20, 5, 20);
+  interactables.push({ id: 'pavilion', mesh: pavilion, x: 20, z: 20, label: '游湖心亭', action: 'view', icon: '🏯' });
+}
+
+function buildHefang() {
+  H.box(mapGroup, 80, 0.2, 20, 0x7a6a5a, 0, 0.1, 0);
+  H.box(mapGroup, 20, 0.2, 80, 0x7a6a5a, 0, 0.1, 0);
+
+  const shops = [
+    { x: -20, z: -15 }, { x: 20, z: -15 }, { x: -20, z: 15 }, { x: 20, z: 15 }
+  ];
+  shops.forEach(s => {
+    H.box(mapGroup, 16, 12, 16, 0xf5f5f5, s.x, 6, s.z, true);
+    H.box(mapGroup, 18, 1, 18, 0x2a2a2a, s.x, 12.5, s.z);
+    for(let i=-6; i<=6; i+=3) {
+      H.sphere(mapGroup, 1.2, 0xd9443a, s.x + i, 9, s.z - (s.z<0?-9:9));
+    }
+  });
+
+  for(let i=-10; i<=10; i+=10) {
+    const stand = H.box(mapGroup, 3, 2, 3, 0x8b6b4a, i, 1, 0, true);
+    H.box(mapGroup, 3.5, 0.2, 3.5, 0xd9443a, i, 2, 0);
+    interactables.push({ id: 'stand_'+i, mesh: stand, x: i, z: 0, label: '看小吃', action: 'look', icon: '🍢' });
+  }
+}
+
+function buildCampus() {
+  H.box(mapGroup, 60, 0.2, 20, 0x4a4a4a, 0, 0.1, 0);
+  H.box(mapGroup, 20, 0.2, 60, 0x4a4a4a, 0, 0.1, 0);
+  H.box(mapGroup, 80, 0.15, 80, 0x5a8a4a, 0, 0.08, 0);
+
+  const towers = [
+    { x: -30, z: -30 }, { x: 30, z: 30 }, { x: -30, z: 30 }, { x: 30, z: -30 }
+  ];
+  towers.forEach(t => {
+    H.box(mapGroup, 20, 50, 20, 0x7a9ab0, t.x, 25, t.z, true);
+    for(let wy=2; wy<50; wy+=4) {
+      H.box(mapGroup, 20.2, 0.2, 20.2, 0x4a6a8a, t.x, wy, t.z);
+    }
+  });
+
+  H.box(mapGroup, 20, 0.2, 20, 0x88bbee, 0, 0.1, 0);
+  interactables.push({ id: 'pool', mesh: null, x: 0, z: 0, label: '看水池', action: 'view', icon: '💧' });
+
+  for(let i=0; i<3; i++) {
+    const vm = H.box(mapGroup, 2, 3, 1.5, 0x333333, 10 + i*3, 1.5, -10, true);
+    interactables.push({ id: 'vm_'+i, mesh: vm, x: 10 + i*3, z: -10, label: '买饮料', action: 'buy', icon: '🥤' });
+  }
+}
+
+function buildMetro() {
+  H.box(mapGroup, 50, 1, 80, 0xc0c0c0, 0, 0.5, 0);
+  H.box(mapGroup, 2, 0.05, 80, 0xe8c84a, 20, 1.05, 0);
+  for(let z=-40; z<=40; z+=2) {
+    H.box(mapGroup, 0.5, 0.1, 0.5, 0x999999, 18, 1.02, z);
+  }
+
+  H.box(mapGroup, 10, 0.5, 80, 0x2a2a2a, 30, 0.25, 0);
+  H.box(mapGroup, 12, 15, 60, 0xd0d0d0, 30, 8, 0, true);
+  H.box(mapGroup, 12.2, 3, 58, 0x2b5c8a, 30, 9, 0);
+  for(let z=-25; z<=25; z+=10) {
+    H.box(mapGroup, 12.4, 4, 4, 0x1a3a5a, 30, 9, z);
+  }
+
+  for(let z=-35; z<=35; z+=10) {
+    if (Math.abs(z) < 5) continue;
+    H.box(mapGroup, 0.4, 6, 6, 0xaaaaaa, 15, 3, z);
+  }
+
+  for(let z=-30; z<=30; z+=20) {
+    H.cyl(mapGroup, 1.5, 1.5, 25, 0xe0e0e0, -10, 12.5, z, 12, true);
+    H.box(mapGroup, 20, 0.2, 1, 0xffffff, 0, 25, z);
+  }
+  H.box(mapGroup, 50, 2, 80, 0x808080, 0, 26, 0);
+
+  interactables.push({ id: 'train', mesh: null, x: 15, z: 0, label: '上车', action: 'ride_metro', icon: '🚄' });
+}
+
+/* ============ 小地图绘制 ============ */
+const miniCanvas = $('minimapCanvas');
+const miniCtx = miniCanvas.getContext('2d');
+
+function drawMinimap() {
+  if (!avatar) return;
+  miniCtx.clearRect(0, 0, 80, 80);
+  
+  miniCtx.fillStyle = '#e0d8c8';
+  miniCtx.fillRect(0, 0, 80, 80);
+  
+  miniCtx.fillStyle = 'rgba(36,31,27,0.4)';
+  colliders.forEach(c => {
+    const mx = 40 + c.x * 0.3;
+    const mz = 40 + c.z * 0.3;
+    if (c.w) miniCtx.fillRect(mx - c.w * 0.3, mz - c.d * 0.3, c.w * 0.6, c.d * 0.6);
+    if (c.r) {
+      miniCtx.beginPath();
+      miniCtx.arc(mx, mz, c.r * 0.3, 0, Math.PI * 2);
+      miniCtx.fill();
+    }
+  });
+
+  miniCtx.fillStyle = '#e8c84a';
+  interactables.forEach(it => {
+    miniCtx.beginPath();
+    miniCtx.arc(40 + it.x * 0.3, 40 + it.z * 0.3, 2.5, 0, Math.PI * 2);
+    miniCtx.fill();
+  });
+
+  const mx = 40 + avatar.position.x * 0.3;
+  const mz = 40 + avatar.position.z * 0.3;
+  miniCtx.fillStyle = '#c8402f';
+  miniCtx.beginPath();
+  miniCtx.arc(mx, mz, 3, 0, Math.PI * 2);
+  miniCtx.fill();
+
+  miniCtx.strokeStyle = '#c8402f';
+  miniCtx.lineWidth = 1.5;
+  miniCtx.beginPath();
+  miniCtx.moveTo(mx, mz);
+  miniCtx.lineTo(mx + Math.sin(avatar.rotation.y) * 8, mz + Math.cos(avatar.rotation.y) * 8);
+  miniCtx.stroke();
+}
+
+setInterval(drawMinimap, 150);
+
+/* ============ 传送系统 ============ */
+$('btnTeleport').addEventListener('click', () => {
+  const list = $('teleportList');
+  const items = [
+    { id: 'home', name: '出租屋(室内)', icon: '🏠' },
+    { id: 'westlake', name: '西湖边', icon: '🏞️' },
+    { id: 'hefang', name: '河坊街', icon: '🏮' },
+    { id: 'campus', name: '西溪园区', icon: '🏢' },
+    { id: 'metro', name: '地铁站', icon: '🚇' }
+  ];
+  list.innerHTML = items.map(i => `
+    <div class="tp-item" data-id="${i.id}">
+      <div class="icon">${i.icon}</div>
+      <div>${i.name}</div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.tp-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.dataset.id;
+      buildScene(id);
+      if (avatar) {
+        avatar.position.set(0, 0, 10);
+        avatar.rotation.y = Math.PI;
+        avatar.rotation.x = 0;
+        G.actionState = 'idle';
+        G.moveTarget = null;
+      }
+      $('teleportModal').classList.remove('on');
+      AudioSys.play('click');
+      
+      const sceneTagEl = $('sceneTag');
+      sceneTagEl.textContent = LANDMARKS[id].name;
+      sceneTagEl.style.opacity = '1';
+      clearTimeout(sceneTagEl._t);
+      sceneTagEl._t = setTimeout(() => { sceneTagEl.style.opacity = '0'; }, 2000);
+      
+      advanceTime(30);
+    });
+  });
+
+  $('teleportModal').classList.add('on');
+});
+
+$('btnTpClose').addEventListener('click', () => {
+  $('teleportModal').classList.remove('on');
+});
+
+/* ============ 屏幕切换与 UI ============ */
+const SCREEN_IDS = ['loading','dressup','sign','game','shop','haggle','report','share'];
+function show(id) {
+  SCREEN_IDS.forEach(s => { const el = $(s); if (el) el.classList.toggle('hidden', s !== id); });
+}
+
+const TIPS = ['正在铺开杭州的街道…','正在等一场西湖的雨…','正在给夜市挂灯笼…','正在叫醒今天的你…'];
+let loadP = 0;
+const loadTimer = setInterval(() => {
+  loadP += 6 + Math.random()*9;
+  if (loadP >= 100) { loadP = 100; clearInterval(loadTimer); setTimeout(showDressup, 240); }
+  $('loadBar').style.width = loadP + '%';
+  $('loadTip').textContent = TIPS[Math.min(TIPS.length-1, Math.floor(loadP/28))];
+}, 90);
+
+let chosenSkin = 'commute';
+function showDressup() {
+  const list = $('skinList');
+  list.innerHTML = SKINS.map(s => `
+    <button class="skin-card${s.id===chosenSkin?' on':''}" data-skin="${s.id}">
+      <div class="skin-prev">${s.icon}</div>
+      <div class="skin-info">
+        <div class="skin-name">${s.name}</div>
+        <div class="skin-desc">${s.desc}</div>
+      </div>
+    </button>
+  `).join('');
+  list.querySelectorAll('.skin-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      chosenSkin = btn.dataset.skin;
+      list.querySelectorAll('.skin-card').forEach(b => b.classList.toggle('on', b === btn));
+    });
+  });
+  show('dressup');
+}
+
+$('btnSkin').addEventListener('click', () => {
+  G.skin = SKINS.find(s => s.id === chosenSkin) || SKINS[0];
+  showSign();
+});
+
+let chosenOrigin = null;
+function showSign() {
+  chosenOrigin = pick(ORIGINS);
+  G.origin = chosenOrigin;
+  $('signIco').textContent = chosenOrigin.icon;
+  $('signName').textContent = chosenOrigin.name;
+  $('signSub').textContent = chosenOrigin.sub;
+  $('signDesc').textContent = chosenOrigin.desc;
+  $('signRent').textContent = chosenOrigin.hasRent ? ('－' + chosenOrigin.rent + ' / 天') : '家里不交租';
+  $('signMoney').textContent = money(chosenOrigin.coin);
+  const stamMax = 100 + (G.skin.bonus.staminaMax || 0);
+  $('signStam').textContent = stamMax + ' / ' + stamMax;
+  show('sign');
+}
+
+/* ============ 开始游戏 & 3D 循环 ============ */
+const stage = $('stage');
+let rafId = 0;
+const clock = new THREE.Clock();
+
+function startGame() {
+  try {
+    const skin = G.skin, origin = G.origin;
+
+    G.day = 1; G.time = 8*60; G.coin = origin.coin;
+    G.staminaMax = 100 + (skin.bonus.staminaMax || 0);
+    G.stamina = G.staminaMax;
+    G.rep = skin.bonus.rep || 0;
+    G.network = skin.bonus.network || 0;
+    G.log = []; G.stall = null; G.started = true;
+    G.actionState = 'idle';
+    G.moveTarget = null;
+
+    if (origin.hasRent) {
+      G.coin -= origin.rent;
+      G.log.push({ type:'expense', text:`房租（${origin.name}）`, amount:-origin.rent });
+    } else {
+      G.log.push({ type:'info', text:'住家里，今天不用交租', amount:0 });
+    }
+
+    buildScene('home');
+
+    if (avatar) scene.remove(avatar);
+    avatar = createAvatar(skin);
+    avatar.position.set(0, 0, 10);
+    scene.add(avatar);
+
+    // 室内初始视角
+    camera.position.set(0, 15, 25);
+    camera.lookAt(0, 0, 0);
+
+    updateHUD();
+    show('game');
+    resize3D();
+
+    setTimeout(() => {
+      const sceneTagEl = $('sceneTag');
+      sceneTagEl.textContent = '出租屋';
+      sceneTagEl.style.opacity = '1';
+      clearTimeout(sceneTagEl._t);
+      sceneTagEl._t = setTimeout(() => { sceneTagEl.style.opacity = '0'; }, 2000);
+    }, 320);
+
+    if (!rafId) {
+      clock.start();
+      rafId = requestAnimationFrame(animate);
+    }
+  } catch (e) {
+    alert("初始化 3D 场景失败: " + e.message);
+    console.error(e);
+  }
+}
+
+$('btnStart').addEventListener('click', startGame);
+
+/* ============ Three.js 主循环 ============ */
+const camLookAt = new THREE.Vector3();
+const targetCamPos = new THREE.Vector3();
+
+function animate() {
+  rafId = requestAnimationFrame(animate);
+  if (!G.started || !avatar) return;
+
+  const dt = Math.min(clock.getDelta(), 0.1);
+  const t = clock.getElapsedTime();
+
+  // 光影
+  const hour = G.time / 60;
+  if (hour >= 8 && hour < 17) {
+    ambientLight.intensity = 0.7;
+    sunLight.intensity = 1.8;
+    sunLight.color.setHex(0xffffff);
+    renderer.setClearColor(currentSceneId === 'home' ? 0x2a2a2a : 0xcde3f2);
+  } else if (hour >= 17 && hour < 19) {
+    ambientLight.intensity = 0.5;
+    sunLight.intensity = 1.2;
+    sunLight.color.setHex(0xffaa88);
+    renderer.setClearColor(currentSceneId === 'home' ? 0x1a1a1a : 0xf7c9a0);
+  } else {
+    ambientLight.intensity = 0.3;
+    sunLight.intensity = 0.4;
+    sunLight.color.setHex(0x4466aa);
+    renderer.setClearColor(currentSceneId === 'home' ? 0x0a0a0a : 0x1a2030);
+  }
+
+  // 动态更新电视画面
+  if (G.tvCtx) {
+    G.tvCtx.fillStyle = '#111';
+    G.tvCtx.fillRect(0, 0, 256, 256);
+    
+    if (G.actionState === 'watching_tv') {
+      const hue = (t * 50) % 360;
+      G.tvCtx.fillStyle = `hsl(${hue}, 80%, 60%)`;
+      G.tvCtx.fillRect(20, 20, 216, 216);
+      
+      G.tvCtx.fillStyle = '#fff';
+      G.tvCtx.font = 'bold 32px sans-serif';
+      G.tvCtx.textAlign = 'center';
+      G.tvCtx.fillText('杭州一日', 128, 110);
+      
+      G.tvCtx.font = 'bold 20px sans-serif';
+      G.tvCtx.fillStyle = '#ffeb3b';
+      G.tvCtx.fillText('广告位招租', 128, 160);
+      
+      G.tvCtx.font = '14px sans-serif';
+      G.tvCtx.fillStyle = '#fff';
+      G.tvCtx.fillText('欢迎来到杭州，祝你今天愉快', 128, 220);
+    }
+    G.tvTexture.needsUpdate = true;
+  }
+
+  // 动态更新冰箱屏幕
+  if (G.fridgeCtx) {
+    G.fridgeCtx.fillStyle = '#1a2a1a';
+    G.fridgeCtx.fillRect(0, 0, 128, 128);
+    
+    G.fridgeCtx.fillStyle = '#88ff88';
+    G.fridgeCtx.font = 'bold 16px monospace';
+    G.fridgeCtx.textAlign = 'center';
+    G.fridgeCtx.fillText(fmtTime(G.time), 64, 30);
+    
+    G.fridgeCtx.font = '10px monospace';
+    G.fridgeCtx.fillStyle = '#66cc66';
+    G.fridgeCtx.fillText('室内 24°C', 64, 60);
+    
+    G.fridgeCtx.fillStyle = '#ffeb3b';
+    G.fridgeCtx.font = '9px sans-serif';
+    if (G.actionState === 'fridge_open') {
+      G.fridgeCtx.fillText('门已打开', 64, 90);
+      G.fridgeCtx.fillText('消耗 -15', 64, 105);
+    } else {
+      G.fridgeCtx.fillText('打工魂燃烧', 64, 90);
+      G.fridgeCtx.fillText('冰箱里只有水了', 64, 105);
+    }
+    G.fridgeTexture.needsUpdate = true;
+  }
+
+  // 扫地机器人逻辑
+  if (G.roomba && currentSceneId === 'home') {
+    if (G.actionState === 'idle' && joystick.active) {
+      // 跟随玩家
+      G.roomba.position.x = lerp(G.roomba.position.x, avatar.position.x + Math.sin(t)*2, 2*dt);
+      G.roomba.position.z = lerp(G.roomba.position.z, avatar.position.z + Math.cos(t)*2, 2*dt);
+    } else {
+      // 随机乱跑
+      G.roomba.position.x += Math.sin(t * 0.5) * dt * 2;
+      G.roomba.position.z += Math.cos(t * 0.7) * dt * 2;
+    }
+  }
+
+  // 移动与状态机
+  if (G.actionState === 'idle') {
+    let isMoving = false;
+    let targetAngle = avatar.rotation.y;
+    const speed = 12; // 降低速度
+
+    if (G.moveTarget) {
+      // 点击寻路模式
+      const dist = Math.hypot(avatar.position.x - G.moveTarget.x, avatar.position.z - G.moveTarget.z);
+      if (dist > 0.5) {
+        targetAngle = Math.atan2(G.moveTarget.x - avatar.position.x, G.moveTarget.z - avatar.position.z);
+        // 移动向量归一化
+        const dirX = (G.moveTarget.x - avatar.position.x) / dist;
+        const dirZ = (G.moveTarget.z - avatar.position.z) / dist;
+        
+        let nextX = avatar.position.x + dirX * speed * dt;
+        let nextZ = avatar.position.z + dirZ * speed * dt;
+        
+        // 智能滑动碰撞
+        if (!checkCollision(nextX, nextZ)) {
+          avatar.position.x = nextX;
+          avatar.position.z = nextZ;
+        } else {
+          if (!checkCollision(nextX, avatar.position.z)) avatar.position.x = nextX;
+          if (!checkCollision(avatar.position.x, nextZ)) avatar.position.z = nextZ;
+        }
+
+        isMoving = true;
+      } else {
+        G.moveTarget = null;
+        isMoving = false;
+      }
+    } else if (joystick.active && (Math.abs(joystick.moveX) > 0.1 || Math.abs(joystick.moveY) > 0.1)) {
+      // 摇杆模式
+      let dx = joystick.moveX;
+      let dz = joystick.moveY;
+      const len = Math.hypot(dx, dz);
+      if (len > 0) {
+        dx /= len;
+        dz /= len;
+      }
+      
+      targetAngle = Math.atan2(dx, dz);
+      
+      let nextX = avatar.position.x + dx * speed * dt;
+      let nextZ = avatar.position.z + dz * speed * dt;
+      
+      // 智能滑动碰撞
+      if (!checkCollision(nextX, nextZ)) {
+        avatar.position.x = nextX;
+        avatar.position.z = nextZ;
+      } else {
+        if (!checkCollision(nextX, avatar.position.z)) avatar.position.x = nextX;
+        if (!checkCollision(avatar.position.x, nextZ)) avatar.position.z = nextZ;
+      }
+      
+      isMoving = true;
+    }
+
+    if (isMoving) {
+      // 平滑转向
+      let diff = targetAngle - avatar.rotation.y;
+      while (diff > Math.PI) diff -= Math.PI * 2;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      avatar.rotation.y += diff * 12 * dt;
+
+      // 边界限制
+      const bound = currentSceneId === 'home' ? 13 : 50;
+      avatar.position.x = clamp(avatar.position.x, -bound, bound);
+      avatar.position.z = clamp(avatar.position.z, -bound, bound);
+
+      // 走路动画
+      walkTime += dt * 15;
+      const swing = Math.sin(walkTime) * 0.8;
+      avatar.userData.armL.rotation.x = swing;
+      avatar.userData.armR.rotation.x = -swing;
+      avatar.userData.legL.rotation.x = -swing;
+      avatar.userData.legR.rotation.x = swing;
+      avatar.position.y = Math.abs(Math.sin(walkTime * 2)) * 0.2;
+      avatar.userData.ahoge.rotation.z = 0.2 + Math.sin(walkTime * 3) * 0.2;
+
+      stepTimer += dt;
+      if (stepTimer > 0.35) {
+        AudioSys.play('step');
+        stepTimer = 0;
+      }
+    } else {
+      // 待机
+      walkTime = 0;
+      avatar.userData.armL.rotation.x *= 0.85;
+      avatar.userData.armR.rotation.x *= 0.85;
+      avatar.userData.legL.rotation.x *= 0.85;
+      avatar.userData.legR.rotation.x *= 0.85;
+      avatar.position.y = Math.sin(t * 3) * 0.05;
+      avatar.userData.ahoge.rotation.z = 0.2 + Math.sin(t * 4) * 0.15;
+      stepTimer = 0;
+    }
+  } 
+  else if (G.actionState === 'going_to_bed' || G.actionState === 'going_to_sofa' || G.actionState === 'going_to_fridge') {
+    let target = new THREE.Vector3();
+    if (G.actionState === 'going_to_bed') target.set(-10, 0, -8);
+    else if (G.actionState === 'going_to_sofa') target.set(8, 0, 5);
+    else if (G.actionState === 'going_to_fridge') target.set(-12, 0, 5);
+
+    avatar.position.x = lerp(avatar.position.x, target.x, 5 * dt);
+    avatar.position.z = lerp(avatar.position.z, target.z, 5 * dt);
+    
+    walkTime += dt * 15;
+    const swing = Math.sin(walkTime) * 0.8;
+    avatar.userData.armL.rotation.x = swing;
+    avatar.userData.armR.rotation.x = -swing;
+    avatar.userData.legL.rotation.x = -swing;
+    avatar.userData.legR.rotation.x = swing;
+    avatar.position.y = Math.abs(Math.sin(walkTime * 2)) * 0.2;
+
+    if (Math.hypot(avatar.position.x - target.x, avatar.position.z - target.z) < 0.5) {
+      if (G.actionState === 'going_to_bed') {
+        G.actionState = 'sleeping';
+        G.actionTimer = 0.8;
+        avatar.rotation.y = 0;
+      } else if (G.actionState === 'going_to_sofa') {
+        G.actionState = 'watching_tv';
+        G.actionTimer = 0.5;
+        avatar.rotation.y = 0;
+      } else if (G.actionState === 'going_to_fridge') {
+        G.actionState = 'fridge_open';
+        G.actionTimer = 0.5;
+        avatar.rotation.y = Math.PI / 2;
+        if (G.fridgeDoor) G.fridgeDoor.rotation.y = -Math.PI / 2;
+        if (G.fridgeLight) G.fridgeLight.visible = true;
+        AudioSys.play('door');
+      }
+    }
+  }
+  else if (G.actionState === 'sleeping') {
+    if (avatar.rotation.x < Math.PI / 2) {
+      avatar.rotation.x = lerp(avatar.rotation.x, Math.PI / 2, 5 * dt);
+      avatar.position.y = lerp(avatar.position.y, 1.5, 5 * dt);
+    } else {
+      G.actionTimer -= dt;
+      if (G.actionTimer <= 0) {
+        $('stageFade').classList.add('on');
+        $('fadeText').textContent = '呼呼大睡中…';
+        $('fadeText').classList.add('on');
+        G.actionTimeout = setTimeout(() => {
+          G.stamina = G.staminaMax;
+          advanceTime(360);
+          updateHUD();
+          $('stageFade').classList.remove('on');
+          $('fadeText').classList.remove('on');
+          
+          // 起床：先移到床边再复位
+          avatar.position.set(-5, 0, -8);
+          avatar.rotation.y = Math.PI;
+          avatar.rotation.x = 0;
+          avatar.position.y = 0;
+          
+          G.actionState = 'idle';
+          G.actionTimeout = null;
+          showBubble('睡醒了，精神百倍。');
+        }, 2000);
+      }
+    }
+  }
+  else if (G.actionState === 'watching_tv') {
+    G.actionTimer += dt;
+    if (G.actionTimer > 3) {
+      G.stamina = clamp(G.stamina + 20, 0, G.staminaMax);
+      G.rep += 2;
+      advanceTime(60);
+      updateHUD();
+      
+      // 起身：挪到沙发外
+      avatar.position.set(8, 0, 2);
+      avatar.rotation.y = Math.PI;
+      
+      G.actionState = 'idle';
+      showBubble('看了会儿电视，体力 +20，口碑 +2。');
+    }
+  }
+  else if (G.actionState === 'fridge_open') {
+    G.actionTimer -= dt;
+    if (G.actionTimer <= 0) {
+      if (G.coin >= 15) {
+        G.coin -= 15;
+        G.stamina = clamp(G.stamina + 30, 0, G.staminaMax);
+        advanceTime(30);
+        updateHUD();
+        showBubble('翻冰箱找了点吃的，体力 +30，花费 15。');
+      } else {
+        showBubble('翻遍了冰箱，只有半瓶水，没找到吃的。');
+      }
+      
+      if (G.fridgeDoor) G.fridgeDoor.rotation.y = 0;
+      if (G.fridgeLight) G.fridgeLight.visible = false;
+      AudioSys.play('door');
+      
+      avatar.position.set(-12, 0, 2);
+      avatar.rotation.y = Math.PI;
+      G.actionState = 'idle';
+    }
+  }
+
+  // 交互检测与提示
+  if (G.actionState === 'idle') {
+    let nearInteract = null;
+    interactables.forEach(it => {
+      const dist = Math.hypot(avatar.position.x - it.x, avatar.position.z - it.z);
+      if (dist < 8) nearInteract = it;
+    });
+
+    if (nearInteract) {
+      if (G.currentInteract !== nearInteract) {
+        G.currentInteract = nearInteract;
+        const bar = $('interactBar');
+        bar.className = 'interact-bar on clickable';
+        bar.innerHTML = `点击【${nearInteract.label}】 ${nearInteract.icon}`;
+        bar.onclick = () => {
+          doInteract(nearInteract);
+          G.moveTarget = null;
+          bar.classList.remove('on', 'clickable');
+        };
+      }
+    } else {
+      if (G.currentInteract) {
+        G.currentInteract = null;
+        const bar = $('interactBar');
+        bar.classList.remove('on', 'clickable');
+        bar.onclick = null;
+      }
+    }
+  } else {
+    if (G.currentInteract) {
+      G.currentInteract = null;
+      $('interactBar').classList.remove('on', 'clickable');
+    }
+  }
+
+  // 摄像机视距自适应
+  const isHome = currentSceneId === 'home';
+  let camDist = isHome ? 15 : 25;
+  let camHeight = isHome ? 15 : 25;
+  
+  if (G.actionState === 'sleeping') {
+    camDist = 10;
+    camHeight = 10;
+  } else if (G.actionState === 'watching_tv' || G.actionState === 'fridge_open') {
+    camDist = 12;
+    camHeight = 8;
+  }
+
+  const behindX = avatar.position.x - Math.sin(avatar.rotation.y) * camDist;
+  const behindZ = avatar.position.z - Math.cos(avatar.rotation.y) * camDist;
+
+  targetCamPos.set(behindX, camHeight, behindZ);
+  camera.position.lerp(targetCamPos, 5 * dt);
+  camLookAt.set(avatar.position.x, isHome ? 2 : 0, avatar.position.z);
+  
+  if (G.actionState === 'watching_tv') {
+    camLookAt.set(0, 4, -14);
+  } else if (G.actionState === 'fridge_open') {
+    camLookAt.set(-12, 5, 5);
+  }
+  camera.lookAt(camLookAt);
+
+  renderer.render(scene, camera);
+}
+
+function doInteract(it) {
+  if (it.action === 'sleep') {
+    G.actionState = 'going_to_bed';
+    G.moveTarget = null;
+  } else if (it.action === 'watch_tv') {
+    G.actionState = 'going_to_sofa';
+    G.moveTarget = null;
+  } else if (it.action === 'open_fridge') {
+    G.actionState = 'going_to_fridge';
+    G.moveTarget = null;
+  } else if (it.action === 'drink') {
+    G.stamina = clamp(G.stamina + 15, 0, G.staminaMax);
+    advanceTime(10);
+    updateHUD();
+    showBubble('咕噜咕噜喝了一大杯水，体力 +15。');
+  } else if (it.action === 'ride_metro') {
+    $('stageFade').classList.add('on');
+    $('fadeText').textContent = '地铁行驶中…';
+    $('fadeText').classList.add('on');
+    setTimeout(() => {
+      const target = pick(['westlake', 'campus']);
+      buildScene(target);
+      avatar.position.set(0, 0, 10);
+      avatar.rotation.y = Math.PI;
+      G.stamina = clamp(G.stamina - 10, 0, G.staminaMax);
+      advanceTime(30);
+      $('stageFade').classList.remove('on');
+      $('fadeText').classList.remove('on');
+      toast('地铁到站：' + LANDMARKS[target].name);
+      updateHUD();
+    }, 2000);
+  } else if (it.action === 'work') {
+    if (G.stamina < 30) { toast('体力不够，先歇会儿吧'); return; }
+    const cost = Math.round(40 * (G.skin.bonus.staminaCost || 1));
+    G.stamina = clamp(G.stamina - cost, 0, G.staminaMax);
+    const pay = Math.round(rand(200, 350) * (1 + G.network/300));
+    G.coin += pay;
+    AudioSys.play('coin');
+    showBubble(`在出租屋加班，到手 ${money(pay)}。`);
+    G.log.push({ type:'income', text:'出租屋加班', amount:+pay });
+    advanceTime(240);
+  } else if (it.action === 'look') {
+    showBubble('摊位上卖的都是杭州特产。');
+    advanceTime(30);
+  } else if (it.action === 'buy') {
+    G.coin -= 10;
+    showBubble('消费了 10 块钱。');
+    advanceTime(30);
+  } else if (it.action === 'view') {
+    G.rep += 2;
+    showBubble('看了会儿风景，心情变好了。');
+    advanceTime(30);
+  }
+  updateHUD();
+}
+
+function resize3D() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  if (w === 0 || h === 0) return;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', () => { if (G.started) resize3D(); });
+
+/* ============ 游戏逻辑 ============ */
+function updateHUD() {
+  $('hudDay').textContent = 'DAY ' + G.day;
+  $('hudTime').textContent = fmtTime(G.time);
+  $('hudCoin').textContent = money(G.coin);
+  $('hudStam').textContent = '⚡' + Math.round(G.stamina);
+  $('hudRep').textContent = '★' + G.rep;
+}
+
+function advanceTime(min) {
+  G.time += min;
+  if (G.time > 24*60) G.time = 24*60;
+  updateHUD();
+  
+  if (G.time >= 22*60 && G.time < 24*60) {
+    G.stamina = clamp(G.stamina - 5, 0, G.staminaMax);
+  }
+  
+  if (G.time >= 24*60) setTimeout(endDay, 500);
+}
+
+function showBubble(text, ms) {
+  const bubbleEl = $('bubble');
+  bubbleEl.textContent = text;
+  bubbleEl.classList.add('on');
+  clearTimeout(bubbleEl._t);
+  bubbleEl._t = setTimeout(() => bubbleEl.classList.remove('on'), ms || 2200);
+}
+
+/* ============ 全局打断与点击寻路 ============ */
+function standUp() {
+  if (G.actionState !== 'idle') {
+    if (G.actionTimeout) {
+      clearTimeout(G.actionTimeout);
+      G.actionTimeout = null;
+    }
+    
+    if (G.fridgeDoor) G.fridgeDoor.rotation.y = 0;
+    if (G.fridgeLight) G.fridgeLight.visible = false;
+
+    avatar.position.set(0, 0, 0);
+    avatar.rotation.y = Math.PI;
+    avatar.rotation.x = 0;
+    avatar.position.y = 0;
+    G.actionState = 'idle';
+    
+    $('stageFade').classList.remove('on');
+    $('fadeText').classList.remove('on');
+    $('interactBar').classList.remove('on', 'clickable');
+    
+    toast('已站起');
+  }
+}
+
+stage.addEventListener('pointerdown', (e) => {
+  // 如果点击了摇杆、提示条，或者不是游戏画面，忽略
+  if (e.target.closest('.joystick-area') || e.target.closest('.interact-bar') || e.target.closest('.map-panel')) return;
+  
+  standUp(); // 点击任意空白处，必定打断当前动作
+
+  // 点击寻路
+  const rect = stage.getBoundingClientRect();
+  mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  
+  // 检测是否点击了物体
+  const intersects = raycaster.intersectObjects(mapGroup.children, true);
+  if (intersects.length > 0) {
+    // 获取交点
+    const point = intersects[0].point;
+    // 设置移动目标
+    G.moveTarget = point.clone();
+    G.moveTarget.y = 0;
+  }
+});
+
+/* ============ 王者荣耀摇杆控制 ============ */
+const joyArea = $('joystickArea');
+const joyStick = $('joystickStick');
+let joyTouchId = null;
+let joyMaxDist = 40;
+
+joyArea.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  standUp(); // 按下摇杆必定打断
+  
+  G.moveTarget = null; // 摇杆优先，清除寻路目标
+
+  if (joyTouchId !== null) return;
+  joyTouchId = e.pointerId;
+  joyArea.setPointerCapture(e.pointerId);
+  
+  const rect = joyArea.getBoundingClientRect();
+  joystick.baseX = rect.left + rect.width / 2;
+  joystick.baseY = rect.top + rect.height / 2;
+  joystick.active = true;
+  joyStick.classList.add('active');
+  
+  handleJoyMove(e.clientX, e.clientY);
+});
+
+joyArea.addEventListener('pointermove', (e) => {
+  if (e.pointerId !== joyTouchId) return;
+  handleJoyMove(e.clientX, e.clientY);
+});
+
+const endJoy = (e) => {
+  if (e.pointerId !== joyTouchId) return;
+  joyTouchId = null;
+  joystick.active = false;
+  joystick.moveX = 0;
+  joystick.moveY = 0;
+  joyStick.classList.remove('active');
+  joyStick.style.transform = `translate(-50%, -50%)`;
+};
+
+joyArea.addEventListener('pointerup', endJoy);
+joyArea.addEventListener('pointercancel', endJoy);
+
+function handleJoyMove(clientX, clientY) {
+  let dx = clientX - joystick.baseX;
+  let dy = clientY - joystick.baseY;
+  const dist = Math.hypot(dx, dy);
+  
+  if (dist > joyMaxDist) {
+    dx = (dx / dist) * joyMaxDist;
+    dy = (dy / dist) * joyMaxDist;
+  }
+  
+  joyStick.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+  
+  joystick.moveX = dx / joyMaxDist;
+  joystick.moveY = dy / joyMaxDist;
+}
+
+/* ============ 键盘控制 ============ */
+const KEYMAP = {
+  ArrowLeft:'left', a:'left', A:'left',
+  ArrowRight:'right', d:'right', D:'right',
+  ArrowUp:'up', w:'up', W:'up',
+  ArrowDown:'down', s:'down', S:'down'
+};
+const keys = { left:false, right:false, up:false, down:false };
+
+window.addEventListener('keydown', (e) => {
+  standUp();
+  G.moveTarget = null;
+  
+  const dir = KEYMAP[e.key];
+  if (!dir) return;
+  e.preventDefault();
+  keys[dir] = true;
+  updateKeyboardJoy();
+});
+
+window.addEventListener('keyup', (e) => {
+  const dir = KEYMAP[e.key];
+  if (!dir) return;
+  e.preventDefault();
+  keys[dir] = false;
+  updateKeyboardJoy();
+});
+
+function updateKeyboardJoy() {
+  if (joystick.active) return;
+  const dx = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+  const dy = (keys.down ? 1 : 0) - (keys.up ? 1 : 0);
+  joystick.moveX = dx;
+  joystick.moveY = dy;
+}
+
+/* ============ 夜市 ============ */
+let stall = null;
+
+function openShop() {
+  if (G.stamina < 20) { toast('体力不够，先回家歇会儿吧'); return; }
+  if (G.coin < 20) { toast('本钱不够，先去打份工吧'); return; }
+  stall = { cart:{}, items:[], rounds:[], round:0, totalRounds:3, revenue:0, cost:0, sold:0, leftover:0, stock:{} };
+  renderShop();
+  show('shop');
+}
+
+function renderShop() {
+  const grid = $('goodsGrid');
+  grid.innerHTML = GOODS.map(g => {
+    const qty = stall.cart[g.id] || 0;
+    return `<div class="good-card">
+      <div class="good-ico">${g.icon}</div>
+      <div class="good-name">${g.name}</div>
+      <div class="good-price">进 ${money(g.cost)} · 售 ${money(g.price)}</div>
+      <div class="good-hot">热度 ${'★'.repeat(g.hot)}</div>
+      <div class="qty">
+        <button data-g="${g.id}" data-d="-1">−</button>
+        <span>${qty}</span>
+        <button data-g="${g.id}" data-d="1">+</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('button[data-g]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.g;
+      const d = parseInt(btn.dataset.d, 10);
+      const cur = stall.cart[id] || 0;
+      const next = clamp(cur + d, 0, 8);
+      
+      const kinds = Object.keys(stall.cart).filter(k => stall.cart[k] > 0);
+      if (next > 0 && cur === 0 && kinds.length >= 4 && !kinds.includes(id)) { toast('最多选 4 种货'); return; }
+      
+      const newCost = totalCost() + d * (GOODS.find(g => g.id===id).cost);
+      if (newCost > G.coin) { toast('本钱不够了'); return; }
+      
+      stall.cart[id] = next;
+      if (next === 0) delete stall.cart[id];
+      renderShop();
+    });
+  });
+  updateCartBar();
+}
+
+function totalCost() { return Object.entries(stall.cart).reduce((s, [id, q]) => { const g = GOODS.find(x=>x.id===id); return s + (g ? g.cost * q : 0); }, 0); }
+function totalCount() { return Object.values(stall.cart).reduce((a,b) => a+b, 0); }
+
+function updateCartBar() {
+  const count = totalCount();
+  const cost = totalCost();
+  $('cartCount').textContent = `已选 ${count} 件`;
+  $('cartCost').textContent = `成本 ${money(cost)}`;
+  $('cartCost').className = cost > G.coin ? 'warn' : '';
+  $('shopMoney').textContent = money(G.coin);
+  $('btnOpenStall').disabled = count === 0;
+}
+
+$('btnShopBack').addEventListener('click', () => { stall = null; show('game'); });
+$('btnOpenStall').addEventListener('click', () => {
+  if (!stall || totalCount() === 0) return;
+  const cost = totalCost();
+  G.coin -= cost;
+  G.stamina = clamp(G.stamina - Math.round(25 * (G.skin.bonus.staminaCost || 1)), 0, G.staminaMax);
+  stall.cost = cost;
+  stall.items = Object.entries(stall.cart).map(([id, qty]) => ({ ...GOODS.find(g => g.id===id), qty }));
+  stall.stock = {};
+  stall.items.forEach(it => { stall.stock[it.id] = it.qty; });
+  stall.round = 0;
+  updateHUD();
+  show('haggle');
+  nextRound();
+});
+
+const CUSTOMERS = [
+  { icon:'🧑', name:'路过的上班族' }, { icon:'👧', name:'放学的小姑娘' },
+  { icon:'👴', name:'遛弯的老杭州' }, { icon:'🧓', name:'带孙子的阿婆' },
+  { icon:'🧑‍🎓', name:'大学生模样的姑娘' }, { icon:'👨‍💼', name:'西装大哥' }
+];
+
+function nextRound() {
+  if (stall.round >= stall.totalRounds) { settleStall(); return; }
+  const avail = stall.items.filter(it => stall.stock[it.id] > 0);
+  if (avail.length === 0) { settleStall(); return; }
+
+  const weighted = [];
+  avail.forEach(it => { for (let i=0; i<it.hot; i++) weighted.push(it); });
+  const target = pick(weighted);
+  const wantQty = Math.min(stall.stock[target.id], randInt(1, 3));
+  stall.current = { item: target, wantQty };
+
+  const cust = pick(CUSTOMERS);
+  $('custIcon').textContent = cust.icon;
+  $('custName').textContent = cust.name;
+  $('custWant').innerHTML = `想买 <b>${target.name}</b> × ${wantQty}<br>标价 ${money(target.price)} / 件`;
+  $('roundTip').textContent = `第 ${stall.round+1} / ${stall.totalRounds} 位顾客`;
+  $('haggleStock').textContent = '库存 ' + Object.values(stall.stock).reduce((a,b)=>a+b,0);
+
+  const strategies = [
+    { id:'hold',   name:'一分不让', desc:`守住 ${money(target.price)}，看对方买不买`, eff:{price:1.15, vol:0.7} },
+    { id:'yield',  name:'八二折',   desc:`按 ${money(target.price*0.8)} 出，走量`,        eff:{price:0.8,  vol:1.35} },
+    { id:'bundle', name:'原价搭赠', desc:`原价，再送个小物件，赚个口碑`,                  eff:{price:1.0,  vol:1.05, rep:3} }
+  ];
+
+  const list = $('stratList');
+  list.innerHTML = strategies.map(s => `
+    <button class="strat-btn" data-s="${s.id}">
+      <div class="st">${s.name}</div>
+      <div class="sd">${s.desc}</div>
+    </button>
+  `).join('');
+
+  list.querySelectorAll('.strat-btn').forEach(btn => {
+    btn.addEventListener('click', () => chooseStrategy(btn.dataset.s, strategies));
+  });
+}
+
+function chooseStrategy(sid, strategies) {
+  const s = strategies.find(x => x.id===sid);
+  if (!s || !stall.current) return;
+
+  const { item, wantQty } = stall.current;
+  const volMul = s.eff.vol * (G.skin.bonus.haggleVolume || 1);
+  let sold = Math.round(wantQty * volMul);
+  sold = clamp(sold, 0, stall.stock[item.id]);
+  if (sold <= 0) sold = Math.min(1, stall.stock[item.id]);
+
+  const priceMul = s.eff.price * (G.skin.bonus.stallPrice || 1);
+  const unit = item.price * priceMul;
+  const revenue = Math.round(unit * sold);
+
+  stall.stock[item.id] -= sold;
+  stall.sold += sold;
+  stall.revenue += revenue;
+  if (s.eff.rep) G.rep += s.eff.rep;
+
+  G.coin += revenue;
+  AudioSys.play('coin');
+  G.log.push({ type:'income', text: `夜市 · ${item.name} × ${sold}（${s.name}）`, amount: revenue });
+  stall.round++;
+  updateHUD();
+  showBubble(`成交 ${sold} 件，进账 ${money(revenue)}。`, 1600);
+
+  setTimeout(() => {
+    if (stall && stall.round < stall.totalRounds) nextRound();
+    else if (stall) settleStall();
+  }, 600);
+}
+
+function settleStall() {
+  if (!stall) return;
+  let leftover = 0;
+  Object.values(stall.stock).forEach(v => { leftover += v; });
+  stall.leftover = leftover;
+  const profit = stall.revenue - stall.cost;
+  G.log.push({ type: profit >= 0 ? 'income' : 'expense', text: `夜市摆摊结束 · 摊位成本 ${money(stall.cost)}`, amount: profit });
+  stall.profit = profit;
+  G.stamina = clamp(G.stamina - 10, 0, G.staminaMax);
+  advanceTime(120);
+
+  const s = stall;
+  const html = `
+    <div class="shop-head" style="margin-bottom:8px;"><h2>收摊结算</h2></div>
+    <div class="ticket rep-card">
+      <div class="settle-rows">
+        <div class="settle-row"><span>卖出件数</span><span class="v">${s.sold} 件</span></div>
+        <div class="settle-row"><span>摊位成本</span><span class="v">－${money(s.cost)}</span></div>
+        <div class="settle-row"><span>销售收入</span><span class="v">＋${money(s.revenue)}</span></div>
+        <div class="settle-row"><span>剩余库存（损耗）</span><span class="v">${s.leftover} 件</span></div>
+        <div class="settle-row total"><span>今日利润</span><span class="v">${money(s.profit)}</span></div>
+      </div>
+    </div>
+    <button class="btn" id="btnStallDone" style="margin-top:14px;">收 摊 回 街</button>
+  `;
+  $('haggle').innerHTML = html;
+  $('btnStallDone').addEventListener('click', () => {
+    stall = null;
+    restoreHaggleShell();
+    show('game');
+  });
+}
+
+function restoreHaggleShell() {
+  $('haggle').innerHTML = `
+    <div class="shop-head"><h2>议价</h2><div class="money" id="haggleStock">库存 0</div></div>
+    <div class="round-tip" id="roundTip">第 1 / 3 位顾客</div>
+    <div class="ticket haggle-card">
+      <div class="customer" id="custIcon">🧑</div>
+      <div class="customer-name" id="custName">顾客</div>
+      <div class="customer-want" id="custWant">想买点东西</div>
+    </div>
+    <div class="strat-list" id="stratList"></div>
+  `;
+}
+
+/* ============ 日报 ============ */
+function endDay() {
+  if (!G.started) return;
+  G.started = false;
+  joystick.moveX = 0; joystick.moveY = 0; joystick.active = false;
+
+  let income = 0, expense = 0;
+  G.log.filter(l => l.type !== 'info').forEach(l => {
+    if (l.amount > 0) income += l.amount;
+    else if (l.amount < 0) expense += -l.amount;
+  });
+
+  const startCoin = G.origin.coin;
+  const net = G.coin - startCoin;
+  const stallInfo = G.log.filter(l => l.text.indexOf('夜市') >= 0);
+
+  $('repDay').textContent = 'DAY · ' + G.day;
+  let html = '';
+  html += `<div class="rep-line"><span>起始资金</span><span class="v">${money(startCoin)}</span></div>`;
+  if (G.origin.hasRent) html += `<div class="rep-line"><span>房租（${G.origin.name}）</span><span class="v neg">－${money(G.origin.rent)}</span></div>`;
+  else html += `<div class="rep-line"><span>房租</span><span class="v">家里不交租</span></div>`;
+  html += `<div class="rep-line"><span>今日收入</span><span class="v pos">＋${money(income)}</span></div>`;
+  html += `<div class="rep-line"><span>今日支出</span><span class="v neg">－${money(expense)}</span></div>`;
+  html += `<div class="rep-line"><span>夜市摆摊</span><span class="v">${stallInfo.length ? stallInfo.map(l=>l.text.split('·')[0].trim()).join(' / ') : '未出摊'}</span></div>`;
+  html += `<div class="rep-line"><span>结余</span><span class="v ${net>=0?'pos':'neg'}">${money(G.coin)}（${net>=0?'+':''}${Math.round(net)}）</span></div>`;
+
+  if (G.log.length) {
+    html += `<div class="rep-log">`;
+    html += G.log.map(l => {
+      let amtStr = '';
+      if (l.amount) amtStr = '（' + (l.amount > 0 ? '+' : '') + money(l.amount) + '）';
+      return `<div>${l.text}${amtStr}</div>`;
+    }).join('');
+    html += `</div>`;
+  }
+  $('repCard').innerHTML = html;
+  G.summary = { income, expense, net, startCoin, endCoin: G.coin };
+  show('report');
+}
+
+$('btnShare').addEventListener('click', () => {
+  const s = G.summary || { net:0, income:0, expense:0, endCoin:G.coin };
+  const grade = s.net > 400 ? '杭 州 小 富 翁' : s.net > 150 ? '还 算 体 面' : s.net > 0 ? '勉 强 活 过' : '明 天 再 来';
+
+  $('shareCard').innerHTML = `
+    <div class="sc-tag">CITY · HANGZHOU</div>
+    <div class="sc-day">DAY ${G.day} · ${G.skin.name}</div>
+    <div class="sc-main">${s.net >= 0 ? '+' : ''}${Math.round(s.net)}</div>
+    <div class="sc-sub">${grade}</div>
+    <div class="sc-grid">
+      <div class="sc-cell"><div class="k">今日收入</div><div class="v">${money(s.income)}</div></div>
+      <div class="sc-cell"><div class="k">今日支出</div><div class="v">${money(s.expense)}</div></div>
+      <div class="sc-cell"><div class="k">结余</div><div class="v">${money(s.endCoin)}</div></div>
+      <div class="sc-cell"><div class="k">口碑</div><div class="v">★${G.rep}</div></div>
+    </div>
+  `;
+  show('share');
+});
+
+$('btnAgain').addEventListener('click', () => {
+  G.started = false;
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = 0;
+  show('dressup');
+});
+
+})();
+</script>
+</body>
+</html>

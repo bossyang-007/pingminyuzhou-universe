@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#f4f0e6">
+<title>平民宇宙 · 人生模拟（3D）</title>
+<style>
+:root{
+  --paper:#f4f0e6; --paper-2:#efe8da; --ink:#2b2620; --ink-soft:#6b5f54;
+  --red:#c8402f; --green:#4a7c59; --gold:#c9962e; --blue:#2b5c8a;
+  --panel:rgba(244,240,230,.86); --line:rgba(43,38,32,.16);
+  --shadow:0 8px 30px rgba(43,38,32,.28);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;height:100%;overflow:hidden;}
+body{
+  background:linear-gradient(160deg,#3a4a55,#22303a 60%,#1a242c);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color:var(--ink); user-select:none; -webkit-user-select:none;
+}
+button{font-family:inherit;color:inherit;border:none;background:none;cursor:pointer;}
+.hidden{display:none !important;}
+canvas#scene{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block;}
+/* 用于捕获拖拽环视的透明层（位于 canvas 之上、UI 之下） */
+#view{position:fixed;inset:0;z-index:1;}
+
+/* 通用屏幕 */
+.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;
+  padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom));
+  background:rgba(14,22,31,.42);backdrop-filter:blur(3px);overflow-y:auto;
+  animation:fade .35s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.center{margin:auto;width:100%;max-width:600px;text-align:center;
+  background:linear-gradient(160deg, rgba(240,248,252,.9), rgba(226,240,250,.84));
+  border:1.5px solid rgba(96,200,236,.5);border-radius:22px;padding:26px 22px;
+  box-shadow:0 0 30px rgba(80,190,230,.28), 0 14px 40px rgba(12,18,26,.4);backdrop-filter:blur(12px) saturate(1.15);}
+.brand{font-size:13px;letter-spacing:6px;color:var(--red);font-weight:700;}
+.title{font-size:clamp(30px,9vw,52px);font-weight:900;margin:6px 0 2px;letter-spacing:2px;}
+.subtitle{color:var(--ink-soft);font-size:14px;margin-bottom:22px;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 22px;border-radius:14px;font-size:16px;font-weight:700;
+  background:var(--ink);color:var(--paper);box-shadow:var(--shadow);transition:.15s;}
+.btn:active{transform:scale(.96);}
+.btn.red{background:var(--red);}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink);box-shadow:none;}
+.btn.gold{background:var(--gold);color:#3a2c10;}
+.row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;
+  box-shadow:var(--shadow);}
+.hint{color:var(--ink-soft);font-size:13px;line-height:1.7;}
+
+/* 身份选择 */
+.id-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:14px 0;}
+.id-card{background:var(--paper-2);border:2px solid transparent;border-radius:14px;padding:14px;
+  text-align:left;transition:.15s;box-shadow:0 3px 0 rgba(43,38,32,.25);}
+.id-card:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(43,38,32,.25);}
+.id-card.sel{border-color:var(--red);background:#fff;}
+.id-ico{font-size:30px;}
+.id-name{font-weight:800;font-size:17px;margin:4px 0 2px;}
+.id-desc{font-size:12px;color:var(--ink-soft);line-height:1.5;}
+.id-stats{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:8px;font-size:11px;color:var(--ink-soft);}
+.id-stats b{color:var(--ink);}
+
+/* ===== 游戏内 UI ===== */
+#gameScreen{background:transparent;backdrop-filter:none;padding:0;pointer-events:none;}
+#gameScreen > *{pointer-events:auto;}
+
+/* 顶部 HUD */
+#hud{position:fixed;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;z-index:6;
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;}
+.hud-left{display:flex;gap:8px;flex-wrap:wrap;}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 10px;
+  font-size:12px;font-weight:700;box-shadow:var(--shadow);display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.chip .v{font-variant-numeric:tabular-nums;}
+.bar{width:46px;height:6px;border-radius:4px;background:rgba(43,38,32,.15);overflow:hidden;}
+.bar > i{display:block;height:100%;border-radius:4px;}
+.hud-right{display:flex;gap:8px;}
+
+/* 音乐控制 */
+#musicBtn{width:42px;height:42px;border-radius:50%;background:var(--panel);border:1px solid var(--line);
+  font-size:18px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;}
+#volWrap{position:fixed;top:max(10px,env(safe-area-inset-top));right:60px;z-index:7;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 10px;
+  display:flex;align-items:center;gap:8px;box-shadow:var(--shadow);}
+#volWrap.hidden{display:none;}
+#vol{width:90px;}
+
+/* 人生控制台：深色全息 HUD —— 更小、更透明、更清晰、不挡人 */
+#panel{position:fixed;z-index:6;
+  /* 半透明深色青玻璃：透出 3D 与人物，青色辉光描边，像悬浮操作台 */
+  background:linear-gradient(165deg, rgba(14,34,48,.46), rgba(9,24,36,.4));
+  border:1px solid rgba(120,225,255,.55);
+  box-shadow:0 0 26px rgba(80,200,240,.32), 0 10px 30px rgba(0,0,0,.3);
+  backdrop-filter:blur(12px) saturate(1.3);
+  border-radius:18px;
+  display:flex;flex-direction:column;left:14px;right:14px;bottom:138px;top:auto;overflow:hidden;
+  padding:10px 12px;max-height:34vh;transition:box-shadow .2s,transform .2s;}
+#panel::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(to bottom, rgba(120,225,255,.05) 0 2px, transparent 2px 5px);opacity:.5;}
+.phead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:8px;
+  border-bottom:1px solid rgba(120,225,255,.28);cursor:grab;touch-action:none;}
+.phead:active{cursor:grabbing;}
+.phead #pTitle{font-size:14px;font-weight:800;color:#eaf7ff;display:flex;align-items:center;gap:6px;text-shadow:0 1px 2px rgba(0,0,0,.5);}
+.grip{opacity:.6;font-size:13px;letter-spacing:-2px;color:#8fd6ff;font-weight:700;}
+#panelToggle{width:28px;height:28px;border:none;border-radius:8px;background:rgba(40,72,92,.6);
+  font-size:14px;font-weight:800;color:#eaf7ff;cursor:pointer;flex:none;}
+#panel.collapsed{max-height:48px;overflow:hidden;}
+#panel.collapsed #tabs,#panel.collapsed #stageLabel,#panel.collapsed #actions,#panel.collapsed #ad{display:none;}
+/* 悬浮：脱离停靠定位，由内联 left/top 控制；轻微浮动动画营造全息悬浮感 */
+#panel.floating{left:auto;right:auto;bottom:auto;top:auto;}
+@keyframes panelFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+#panel.float-on{animation:panelFloat 6s ease-in-out infinite;}
+#panel.dragging{animation:none !important;}
+#tabs{display:flex;gap:7px;margin-bottom:8px;}
+.tab{flex:1;padding:7px 4px;border-radius:11px;background:rgba(255,255,255,.08);font-size:12.5px;font-weight:700;color:#cfeaff;
+  display:flex;flex-direction:column;align-items:center;gap:2px;border:1.5px solid transparent;text-shadow:0 1px 2px rgba(0,0,0,.4);}
+.tab.sel{border-color:rgba(120,225,255,.8);background:rgba(120,225,255,.18);}
+.tab .e{font-size:19px;}
+#stageLabel{font-size:12px;font-weight:800;color:#8fd6ff;text-align:center;margin-bottom:8px;letter-spacing:.3px;text-shadow:0 1px 2px rgba(0,0,0,.4);}
+#actions{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;overflow-y:auto;padding-right:2px;}
+.act{background:rgba(255,255,255,.07);border:1.5px solid rgba(120,225,255,.18);border-radius:12px;padding:9px 9px;text-align:left;
+  color:#eaf7ff;box-shadow:0 2px 0 rgba(0,0,0,.25);transition:.12s;}
+.act:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.25);}
+@media (hover:hover){ .act:hover{background:rgba(120,225,255,.18);border-color:rgba(120,225,255,.8);transform:translateY(-1px);box-shadow:0 5px 12px rgba(0,0,0,.35);} }
+.act .h{display:flex;align-items:center;gap:6px;font-weight:800;font-size:13px;text-shadow:0 1px 2px rgba(0,0,0,.4);}
+.act .h .e{font-size:17px;}
+.act .d{font-size:10.5px;color:#a9cfe0;margin-top:3px;line-height:1.4;}
+.act .fx{font-size:10px;color:#7CFFA0;margin-top:4px;font-weight:700;}
+
+/* 广告位（深色全息风） */
+#ad{margin:8px 0 2px;display:flex;align-items:center;gap:9px;background:rgba(120,225,255,.12);
+  border:1px dashed rgba(120,225,255,.45);border-radius:11px;padding:7px 11px;cursor:pointer;}
+#ad .tag{font-size:10px;font-weight:800;color:#fff;background:var(--gold);border-radius:6px;padding:2px 6px;flex:none;}
+#ad .e{font-size:20px;}
+#ad .t{font-size:12.5px;font-weight:700;line-height:1.3;color:#eaf7ff;}
+#ad .s{font-size:10px;color:#a9cfe0;}
+
+/* 日记 */
+#logToggle{position:fixed;left:10px;bottom:calc(62vh + 14px);z-index:6;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:13px;font-weight:700;box-shadow:var(--shadow);}
+#logSheet{position:fixed;inset:0;z-index:8;background:rgba(43,38,32,.45);display:flex;align-items:flex-end;}
+#logSheet.hidden{display:none;}
+#logBox{background:var(--paper);width:100%;max-height:70vh;border-radius:18px 18px 0 0;padding:16px;overflow-y:auto;}
+#logBox h3{margin:0 0 10px;font-size:16px;}
+.log-item{font-size:13px;line-height:1.6;padding:8px 0;border-bottom:1px dashed var(--line);}
+.log-item .yr{color:var(--red);font-weight:800;margin-right:6px;}
+
+/* 全息选择卡：从控制台“跳出来”，悬浮在角色前方上方，半透明不挡人 */
+.modal{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-start;justify-content:center;
+  background:rgba(8,18,28,.32);padding:13vh 18px 18px;backdrop-filter:blur(2px);}
+.modal.hidden{display:none;}
+.modal .box{background:linear-gradient(160deg, rgba(20,44,60,.8), rgba(13,30,42,.72));
+  border:1.5px solid rgba(120,225,255,.7);border-radius:20px;max-width:480px;width:100%;padding:20px;
+  box-shadow:0 0 44px rgba(80,200,240,.5), 0 16px 42px rgba(0,0,0,.45);backdrop-filter:blur(14px) saturate(1.3);
+  color:#eaf7ff;animation:holoPop .28s ease;}
+@keyframes holoPop{from{transform:translateY(20px) scale(.94);opacity:0;}to{transform:none;opacity:1;}}
+@keyframes pop{from{transform:scale(.9);opacity:0;}to{transform:none;opacity:1;}}
+.modal h2{margin:0 0 8px;font-size:20px;color:#cfeeff;}
+.modal p{font-size:14px;line-height:1.7;color:#bfe2f2;margin:0 0 14px;}
+.choices{display:flex;flex-direction:column;gap:10px;}
+.choice{background:rgba(40,72,92,.6);border:2px solid rgba(120,225,255,.55);border-radius:13px;padding:12px 14px;text-align:left;
+  font-weight:700;font-size:14px;color:#eaf7ff;transition:.12s;}
+.choice:active{transform:scale(.97);background:rgba(60,104,128,.72);}
+.choice small{display:block;font-weight:500;color:#9fcfe2;font-size:12px;margin-top:3px;}
+
+/* 事件弹窗改为底部卡片：透明遮罩，画面与人物保持可见 */
+.modal.sheet{background:transparent;align-items:flex-end;padding:0;backdrop-filter:none;}
+.modal.sheet .box{margin:0 auto max(14px,env(safe-area-inset-bottom));max-width:520px;width:calc(100% - 24px);
+  max-height:42vh;overflow:auto;border-radius:18px 18px 0 0;animation:slideUp .25s ease;}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0;}to{transform:none;opacity:1;}}
+
+/* 加载 */
+#loading{position:fixed;inset:0;z-index:30;background:linear-gradient(160deg,#3a4a55,#1a242c);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;color:#eee;gap:14px;}
+.spinner{width:42px;height:42px;border:4px solid rgba(255,255,255,.2);border-top-color:#c9962e;border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+#toast{position:fixed;left:50%;bottom:14%;transform:translateX(-50%);z-index:40;background:rgba(43,38,32,.92);
+  color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;}
+
+/* 结算 */
+#endScreen .card{max-width:560px;margin:auto;}
+.end-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0;}
+.end-stat{background:var(--paper-2);border-radius:12px;padding:10px;text-align:center;}
+.end-stat .n{font-size:20px;font-weight:900;}
+.end-stat .l{font-size:11px;color:var(--ink-soft);}
+.verdict{font-size:15px;line-height:1.8;background:var(--paper-2);border-radius:12px;padding:14px;margin:10px 0;}
+
+/* 电脑端：控制台更小平居下方，日记常驻左上 */
+@media (min-width:860px){
+  #panel{left:50%;right:auto;top:auto;bottom:96px;transform:translateX(-50%);width:400px;max-height:38vh;border-radius:20px;}
+  #logToggle{top:84px;bottom:auto;right:auto;left:10px;}
+  .id-grid{grid-template-columns:repeat(3,1fr);}
+}
+/* 游戏态：让 3D 场景可见，UI 浮于其上 */
+#gameScreen{background:transparent;backdrop-filter:none;pointer-events:none;}
+#panel,#hud,#volWrap,#logToggle,#logSheet{pointer-events:auto;}
+
+/* 虚拟摇杆（手机） */
+#joystick{position:fixed;left:16px;bottom:max(18px,env(safe-area-inset-bottom));z-index:12;width:118px;height:118px;border-radius:50%;
+  background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.4);display:none;touch-action:none;box-shadow:0 4px 14px rgba(0,0,0,.25);}
+#joyThumb{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;
+  background:rgba(201,150,46,.92);box-shadow:0 2px 8px rgba(0,0,0,.35);}
+@media (max-width:859px){
+  #joystick{display:block;bottom:max(18px,env(safe-area-inset-bottom));}
+  #interactHint{bottom:calc(52vh + 20px);}
+  #logToggle{top:max(10px,env(safe-area-inset-top));bottom:auto;left:10px;}
+}
+
+/* 互动提示 */
+#interactHint{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:12;display:flex;gap:10px;align-items:center;
+  background:rgba(43,38,32,.92);color:#fff;padding:8px 12px;border-radius:24px;font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+#interactHint button{background:var(--red);color:#fff;border:none;border-radius:18px;padding:7px 15px;font-size:13px;font-weight:700;cursor:pointer;}
+#ihName{font-weight:600;}
+
+/* 场景行动卡弹窗 */
+#spotChoices .ico{font-size:20px;}
+</style>
+</head>
+<body>
+
+<div id="loading"><div class="spinner"></div><div style="font-size:14px">正在搭建平民宇宙…</div></div>
+
+<canvas id="scene"></canvas>
+<div id="view"></div>
+<div id="joystick"><div id="joyThumb"></div></div>
+<div id="interactHint" class="hidden"><span id="ihName">互动点</span><button id="ihBtn">互动 (E)</button></div>
+
+<!-- 开始 -->
+<section id="startScreen" class="screen">
+  <div class="center">
+    <div class="brand">PINGMIN&nbsp;UNIVERSE</div>
+    <div class="title">平民宇宙</div>
+    <div class="subtitle">人生模拟 · 在柴米油盐里，过好你的一生</div>
+    <div class="card hint" style="text-align:left;margin-bottom:18px">
+      你将从 <b>18+</b> 岁的某个普通人开始，在高度智能化的「平民智城」里<b>走动探索</b>、逐年做出生活抉择。<br>
+      🏠 居家 💼 职场 🏙️ 街角 🌳 公园 🏮 夜市 🛍️ 商场 —— 走向<b>全息投影互动点</b>触发当年行动，走向不同人生。<br>
+      身边悬浮着<b>全息电子屏</b>（实时显示状态）与<b>智能伙伴光球</b>；地面是<b>霓虹网格</b>、空中漂浮着全息广告牌。<br>
+      电脑：<b>WASD / 方向键</b> 移动，拖动画面<b>环视</b>，靠近时按 <b>E</b> 互动；手机：左下<b>摇杆</b>移动，点击屏幕转视角，靠近点<b>互动</b>。右下角可开关<b>背景音乐</b>。
+    </div>
+    <div class="row">
+      <button class="btn red" id="newBtn">开始新人生</button>
+      <button class="btn ghost hidden" id="contBtn">继续人生</button>
+    </div>
+    <div class="hint" style="margin-top:16px">提示：进度自动保存在本机，可随时关闭后再来。</div>
+  </div>
+</section>
+
+<!-- 身份选择 -->
+<section id="identityScreen" class="screen hidden">
+  <div class="center" style="max-width:640px">
+    <div class="brand">STEP 1</div>
+    <div class="title" style="font-size:34px">选择你的起点</div>
+    <div class="subtitle">不同身份，起点与机遇各不相同</div>
+    <div class="id-grid" id="idGrid"></div>
+    <button class="btn red" id="startLifeBtn" disabled style="opacity:.5">进入人生 →</button>
+    <button class="btn ghost" id="backStartBtn" style="margin-top:10px">← 返回</button>
+  </div>
+</section>
+
+<!-- 游戏 -->
+<section id="gameScreen" class="screen hidden">
+  <div id="hud">
+    <div class="hud-left">
+      <div class="chip">🧭 <span class="v" id="hudAge">22</span>岁</div>
+      <div class="chip">💰 <span class="v" id="hudMoney">0</span></div>
+      <div class="chip">❤️ <span id="hudHealthBar" class="bar"><i style="width:80%;background:var(--red)"></i></span></div>
+      <div class="chip">😊 <span id="hudHappyBar" class="bar"><i style="width:60%;background:var(--gold)"></i></span></div>
+      <div class="chip">🤝 <span id="hudNetBar" class="bar"><i style="width:40%;background:var(--blue)"></i></span></div>
+      <div class="chip">⚡ <span id="hudEngBar" class="bar"><i style="width:80%;background:var(--green)"></i></span></div>
+    </div>
+    <div class="hud-right">
+      <button id="musicBtn" title="背景音乐">🎵</button>
+    </div>
+  </div>
+
+  <div id="volWrap" class="hidden">
+    <span style="font-size:12px">🔊</span>
+    <input type="range" id="vol" min="0" max="100" value="55">
+  </div>
+
+  <div id="panel">
+    <div class="phead" id="phead">
+      <span id="pTitle"><span class="grip">⠿</span>人生控制台</span>
+      <button id="panelToggle" title="收起/展开">▾</button>
+    </div>
+    <div id="tabs"></div>
+    <div id="stageLabel"></div>
+    <div id="actions"></div>
+    <div id="ad">
+      <span class="tag">广告</span>
+      <span class="e" id="adEmoji">🛰️</span>
+      <div style="flex:1;min-width:0">
+        <div class="t" id="adText">平民智城 · 全息家居套餐上线</div>
+        <div class="s" id="adSub">演示广告位 · 点击了解更多</div>
+      </div>
+    </div>
+  </div>
+
+  <button id="logToggle">📔 人生日记</button>
+  <div id="logSheet" class="hidden">
+    <div id="logBox">
+      <h3>📔 人生日记</h3>
+      <div id="logList"></div>
+      <button class="btn ghost" id="closeLog" style="margin-top:12px;width:100%">关闭</button>
+    </div>
+  </div>
+</section>
+
+<!-- 事件弹窗（全息悬浮卡，从控制台“跳出来”做选择） -->
+<div id="eventModal" class="modal hidden">
+  <div class="box">
+    <h2 id="evTitle"></h2>
+    <p id="evText"></p>
+    <div class="choices" id="evChoices"></div>
+  </div>
+</div>
+
+<!-- 场景互动行动卡 -->
+<div id="spotModal" class="modal hidden">
+  <div class="box">
+    <h2 id="spotTitle">选择行动</h2>
+    <p id="spotDesc" class="hint"></p>
+    <div class="choices" id="spotChoices"></div>
+    <button class="btn ghost" id="spotClose" style="margin-top:12px">离开</button>
+  </div>
+</div>
+
+<!-- 结算 -->
+<section id="endScreen" class="screen hidden">
+  <div class="card">
+    <div class="brand" style="text-align:center">THE END</div>
+    <div class="title" style="font-size:30px;text-align:center" id="endTitle">人生谢幕</div>
+    <div class="end-stats" id="endStats"></div>
+    <div class="verdict" id="endVerdict"></div>
+    <div class="row">
+      <button class="btn red" id="replayBtn">再活一次</button>
+      <button class="btn ghost" id="copyBtn">复制人生总结</button>
+    </div>
+  </div>
+</section>
+
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   平民宇宙 · 人生模拟（3D）—— 单文件实现
+   依赖：Three.js（CDN，自动降级）+ 原生 UI + Web Audio BGM
+   ============================================================ */
+"use strict";
+
+/* ---------- 工具 ---------- */
+const $ = s => document.querySelector(s);
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const rnd = (a,b)=>a+Math.random()*(b-a);
+const ri = (a,b)=>Math.floor(rnd(a,b+1));
+const fmt = n => (n<0?'-':'') + Math.abs(Math.round(n)).toLocaleString('zh-CN');
+let toastTimer;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
+
+/* ---------- 身份定义 ---------- */
+const IDENTITIES = [
+  {id:'office', name:'上班族', ico:'💼', desc:'朝九晚五，稳定但平淡',
+    base:{age:22,money:6000,health:82,happy:62,network:42,energy:82,skill:18,rep:12}, income:72000},
+  {id:'shop', name:'小店主', ico:'🏪', desc:'自己当老板，盈亏自负',
+    base:{age:25,money:38000,health:76,happy:56,network:50,energy:74,skill:30,rep:16}, income:56000},
+  {id:'free', name:'自由职业', ico:'🎨', desc:'时间自由，收入浮动',
+    base:{age:24,money:14000,health:78,happy:72,network:46,energy:80,skill:42,rep:22}, income:46000},
+  {id:'stu', name:'在校大学生', ico:'🎓', desc:'囊中羞涩，未来可期',
+    base:{age:19,money:2000,health:92,happy:78,network:62,energy:96,skill:16,rep:6}, income:0},
+  {id:'rider', name:'外卖骑手', ico:'🛵', desc:'风里来雨里去，赚钱辛苦',
+    base:{age:23,money:9000,health:70,happy:50,network:30,energy:72,skill:10,rep:10}, income:64000},
+  {id:'retire', name:'退休老人', ico:'🧓', desc:'含饴弄孙，安享晚年',
+    base:{age:62,money:90000,health:58,happy:66,network:72,energy:54,skill:54,rep:44}, income:46000},
+];
+
+/* ---------- 行动定义（每个行动 = 度过一年） ---------- */
+const ACTIONS = [
+  {id:'work',  name:'安稳工作', ico:'💼', desc:'按部就班上班，收入稳定',
+    fx:'+收入 · 微耗健康', eff:{health:-3,happy:-1,energy:-25,rep:3,network:1,inc:1.0}},
+  {id:'ot',    name:'拼命加班', ico:'🔥', desc:'用健康换钱，偶尔出错',
+    fx:'+高收入 · 伤身', eff:{health:-9,happy:-7,energy:-45,rep:5,inc:1.7,risk:0.18}},
+  {id:'study', name:'学习进修', ico:'📚', desc:'提升技能，为未来铺路',
+    fx:'技能↑ · 花钱耗时', eff:{health:1,happy:1,energy:-10,skill:9,network:2,money:-2200,inc:0.3}},
+  {id:'social',name:'社交应酬', ico:'🍻', desc:'维系人脉，放松身心',
+    fx:'人脉↑ 快乐↑ · 花钱', eff:{health:-1,happy:7,energy:-8,network:10,money:-3200,inc:0.5}},
+  {id:'fit',   name:'健身养生', ico:'🏃', desc:'锻炼身体，元气满满',
+    fx:'健康↑ 精力↑', eff:{health:9,happy:4,energy:15,money:-500,inc:0.4}},
+  {id:'leisure',name:'休闲旅游', ico:'🌴', desc:'看看世界，犒劳自己',
+    fx:'快乐↑↑ 精力↑↑ · 花钱', eff:{health:1,happy:16,energy:25,money:-4200,inc:0.2}},
+  {id:'invest',name:'投资理财', ico:'📈', desc:'让钱生钱，也可能踩雷',
+    fx:'收益随机 ±', eff:{happy:1,network:1,inc:0.2,invest:0.18}},
+  {id:'biz',   name:'创业副业', ico:'🚀', desc:'高风险高回报的赌注',
+    fx:'收益波动大', eff:{health:-5,happy:2,skill:3,rep:2,energy:-15,inc:0.1,biz:0.28}},
+];
+
+/* ---------- 随机事件 ---------- */
+const EVENTS = [
+  {t:'邻里纠纷', x:'楼下新搬来的邻居总在深夜喧哗，你……',
+   c:[{l:'上门沟通',s:'缓和关系，人脉+3',e:{network:3,happy:1}},
+      {l:'忍气吞声',s:'省事但憋屈，快乐-3',e:{happy:-3}},
+      {l:'找物业投诉',s:'问题解决，但得罪人，人脉-2',e:{network:-2,happy:2}}]},
+  {t:'体检报告', x:'年度体检显示各项指标基本正常，医生叮嘱你多运动。',
+   c:[{l:'听进去了',s:'健康+4',e:{health:4}},{l:'左耳进右耳出',s:'无变化',e:{}}]},
+  {t:'老友来电', x:'多年未联系的老同学突然打来电话，说想聚聚。',
+   c:[{l:'爽快赴约',s:'叙旧升温，人脉+5 快乐+4',e:{network:5,happy:4}},
+      {l:'婉言推掉',s:'省下时间，但略遗憾',e:{happy:-1}}]},
+  {t:'意外红包', x:'亲戚家办喜事，你随了份子，回家却收到长辈红包。',
+   c:[{l:'心怀感恩',s:'金钱+1500 快乐+2',e:{money:1500,happy:2}},
+      {l:'平淡收下',s:'金钱+800',e:{money:800}}]},
+  {t:'职场变动', x:'公司传出要裁员的风声，气氛微妙。',
+   c:[{l:'主动表现',s:'化险为夷，声望+4',e:{rep:4,energy:-8}},
+      {l:'躺平观望',s:'心惊胆战，快乐-4',e:{happy:-4}},
+      {l:'未雨绸缪投简历',s:'人脉+3 技能+2',e:{network:3,skill:2}}]},
+  {t:'网络热点', x:'你随手拍的街景意外小火，引来不少关注。',
+   c:[{l:'顺势互动',s:'人脉+6 声望+3',e:{network:6,rep:3}},
+      {l:'低调处理',s:'波澜不惊',e:{}}]},
+  {t:'家中漏水', x:'一阵暴雨后，老房子天花板渗了水。',
+   c:[{l:'赶紧修葺',s:'花钱消灾，金钱-2600',e:{money:-2600,happy:-1}},
+      {l:'凑合住着',s:'隐患未除，健康-3',e:{health:-3}}]},
+  {t:'公益志愿', x:'社区招募志愿者，为老人送餐。',
+   c:[{l:'报名参加',s:'温暖他人，快乐+5 声望+4',e:{happy:5,rep:4,energy:-6}},
+      {l:'工作要紧',s:'错过，略遗憾',e:{happy:-1}}]},
+  {t:'技能变现', x:'你学到的一门手艺，被人出钱请帮忙。',
+   c:[{l:'接单',s:'金钱+3000 技能+2',e:{money:3000,skill:2}},
+      {l:'无偿帮忙',s:'人情+，人脉+4',e:{network:4}}]},
+  {t:'情绪低谷', x:'某个深夜，你突然觉得生活有点没劲。',
+   c:[{l:'出门走走',s:'自愈，快乐+3 健康+1',e:{happy:3,health:1}},
+      {l:'刷手机到天亮',s:'快乐-2 精力-10',e:{happy:-2,energy:-10}}]},
+  {t:'理财踩坑', x:'听信“稳赚”项目，投进去的钱打了水漂。',
+   c:[{l:'认栽离场',s:'金钱-4000 快乐-3',e:{money:-4000,happy:-3}},
+      {l:'加码回本',s:'赌博心态，或亏或赚',e:{money:-ri(2000,9000),happy:-2}}]},
+  {t:'家庭聚餐', x:'许久未见的一家人围坐吃饭，热气腾腾。',
+   c:[{l:'珍惜当下',s:'快乐+6 健康+2',e:{happy:6,health:2}}]},
+  {t:'旧物翻新', x:'你翻出闲置物品挂上二手平台，竟卖了个好价。',
+   c:[{l:'断舍离',s:'金钱+1800 快乐+2',e:{money:1800,happy:2}}]},
+  {t:'突如其来的假', x:'老板心情好，给你放了天假。',
+   c:[{l:'睡到自然醒',s:'精力+20 快乐+4',e:{energy:20,happy:4}}]},
+  {t:'热心助人', x:'路边有人需要帮忙，你伸了手。',
+   c:[{l:'举手之劳',s:'快乐+3 声望+2',e:{happy:3,rep:2}}]},
+  {t:'市场回暖', x:'你所在的行业迎来一波小阳春。',
+   c:[{l:'抓住机会',s:'金钱+5000 声望+3',e:{money:5000,rep:3}},
+      {l:'保守起见',s:'平稳过渡',e:{}}]},
+];
+
+/* ---------- 里程碑事件 ---------- */
+function milestoneEvents(){
+  const a = state.age, id = state.identity.id, f = state.flags;
+  if(id==='stu' && !f.grad && a>=22) return {
+    t:'顺利毕业', x:'你戴上学士帽，把学位证举过头顶。学生时代落幕，职场的大门开了。',
+    c:[{l:'步入社会',s:'获得就业能力',e:{}, set:{grad:true, income:68000}}]};
+  if(!f.thirty && a>=30) return {
+    t:'三十而立', x:'三十岁像一道坎。身边人陆续成家，你也在想：要不要安定下来？',
+    c:[{l:'成家立业',s:'结婚生子，责任+，快乐+',e:{happy:4,rep:3}, set:{married:true, child:true}},
+       {l:'继续拼搏',s:'自由但孤独，人脉+',e:{network:5}, set:{married:false}}]};
+  if(!f.crisis && a>=35) return {
+    t:'中年感悟', x:'三十五岁，身体开始抗议，父母渐老，孩子正烧钱。你重新审视生活的重心。',
+    c:[{l:'注重健康家庭',s:'健康+6 快乐+3',e:{health:6,happy:3}},
+       {l:'全力搞钱',s:'金钱+6000 健康-4',e:{money:6000,health:-4}}]};
+  if(id!=='retire' && !f.retired && a>=60) return {
+    t:'光荣退休', x:'单位为你办了欢送会。从此不用赶早高峰，时间真正属于自己。',
+    c:[{l:'享受晚年',s:'转领养老金',e:{happy:5,health:3}, set:{retired:true, income:46000}}]};
+  return null;
+}
+
+/* ============================================================
+   游戏状态
+   ============================================================ */
+let state = null;
+const SAVE_KEY = 'pingmin_yuzhou_save_v1';
+
+function newState(identity){
+  const b = identity.base;
+  return {
+    identity, age:b.age, money:b.money, health:b.health, happy:b.happy,
+    network:b.network, energy:b.energy, skill:b.skill, rep:b.rep,
+    income: identity.id==='stu'?0:identity.income,
+    location:'home', log:[], flags:{}, milestones:{}, ended:false, turns:0
+  };
+}
+
+/* ---------- 渲染 HUD ---------- */
+function bar(id,val,color){
+  const wrap=$(id); wrap.querySelector('i').style.width=clamp(val,0,100)+'%';
+  wrap.querySelector('i').style.background=color;
+}
+function renderHUD(){
+  $('#hudAge').textContent=state.age;
+  $('#hudMoney').textContent=fmt(state.money);
+  bar('#hudHealthBar',state.health,'var(--red)');
+  bar('#hudHappyBar',state.happy,'var(--gold)');
+  bar('#hudNetBar',state.network,'var(--blue)');
+  bar('#hudEngBar',state.energy,'var(--green)');
+}
+function stageLabel(){
+  if(!state) return;
+  const a=state.age;
+  let s = a<28?'青年 · 热血而迷茫': a<45?'壮年 · 撑起一片天': a<60?'中年 · 沉稳前行':'银发 · 慢享时光';
+  const locName={home:'居家',office:'职场',street:'街角',park:'公园',nightmarket:'夜市',mall:'商场'}[state.location];
+  let t = `当前场景：${locName} ｜ ${s}`;
+  if(nearbySpot && state && !state.ended) t = `📍 在【${nearbySpot.label}】附近 ｜ ${locName}`;
+  $('#stageLabel').textContent = t;
+}
+
+/* ---------- 地点/场景切换 UI ---------- */
+const LOCS=[
+  {id:'home',name:'居家',e:'🏠'},
+  {id:'office',name:'职场',e:'💼'},
+  {id:'street',name:'街角',e:'🏙️'},
+  {id:'park',name:'公园',e:'🌳'},
+  {id:'nightmarket',name:'夜市',e:'🏮'},
+  {id:'mall',name:'商场',e:'🛍️'},
+];
+function renderTabs(){
+  const t=$('#tabs'); t.innerHTML='';
+  LOCS.forEach(l=>{
+    const b=document.createElement('div');
+    b.className='tab'+(state.location===l.id?' sel':'');
+    b.innerHTML=`<span class="e">${l.e}</span>${l.name}`;
+    b.onclick=()=>{ state.location=l.id; renderTabs(); stageLabel(); setScene(l.id); sfx(); };
+    t.appendChild(b);
+  });
+}
+// 控制面板：始终展示全部 8 大行动（逐年决策的入口，稳定不随走动变化）
+function renderActions(){
+  if(!state) return;
+  const a=$('#actions'); a.innerHTML='';
+  ACTIONS.forEach(ac=>{
+    const b=document.createElement('button');
+    b.className='act';
+    b.innerHTML=`<div class="h"><span class="e">${ac.ico}</span>${ac.name}</div>
+      <div class="d">${ac.desc}</div><div class="fx">${ac.fx}</div>`;
+    b.onclick=()=>doAction(ac);
+    a.appendChild(b);
+  });
+}
+
+/* ============================================================
+   核心：执行一年的人生
+   ============================================================ */
+function effectiveIncome(){
+  let base = state.income + state.skill*220;
+  if(state.identity.id==='stu' && !state.flags.grad) base = 10000; // 生活费
+  return Math.max(0,base);
+}
+function doAction(ac){
+  if(state.ended) return;
+  sfx();
+  const e=ac.eff;
+  // 立即效果
+  if(e.health) state.health=clamp(state.health+e.health,0,100);
+  if(e.happy)  state.happy =clamp(state.happy+e.happy,0,100);
+  if(e.network)state.network=clamp(state.network+e.network,0,100);
+  if(e.energy) state.energy=clamp(state.energy+e.energy,0,100);
+  if(e.skill)  state.skill=clamp(state.skill+e.skill,0,100);
+  if(e.rep)    state.rep=clamp(state.rep+e.rep,0,100);
+  if(e.money)  state.money+=e.money;
+
+  // 风险：加班/投资/创业可能出岔子
+  let incMult = e.inc||0;
+  if(e.risk && Math.random()<e.risk){ state.health=clamp(state.health-6,0,100); state.happy=clamp(state.happy-4,0,100);
+    pushLog(`一次${ac.name}出了岔子，身体和心情都受了影响。`); }
+  if(e.invest){ const r=Math.random(); if(r<0.45){ const g=ri(2000,12000); state.money+=g; pushLog(`投资小赚一笔 +¥${g}。`); }
+    else if(r<0.7){ const l=ri(1500,9000); state.money-=l; pushLog(`投资浮亏 -¥${l}。`); } else pushLog(`理财平稳，略有结余。`); }
+  if(e.biz){ const r=Math.random(); if(r<0.4){ const g=ri(5000,26000); state.money+=g; state.happy=clamp(state.happy+5,0,100); pushLog(`副业大爆发 +¥${g}！`); }
+    else if(r<0.72){ const l=ri(3000,16000); state.money-=l; state.happy=clamp(state.happy-4,0,100); pushLog(`创业受挫 -¥${l}。`); } else pushLog(`副业不温不火，勉强糊口。`); }
+
+  // 精力过低惩罚
+  if(state.energy<20){ incMult*=0.7; state.health=clamp(state.health-2,0,100); }
+
+  // 度过这一年
+  state.age+=1; state.turns+=1;
+  let earn = effectiveIncome()*incMult;
+  if(state.money>0) earn += state.money*0.02; // 存款利息
+  state.money += Math.round(earn);
+  state.energy = clamp(state.energy+22,0,100); // 年休养生息
+  if(state.age>50) state.health=clamp(state.health-1,0,100); // 自然衰老
+  state.money = clamp(state.money,-30000,1e9);
+
+  renderHUD(); stageLabel(); save();
+
+  // 先判定里程碑，再随机事件（避免一年两个弹窗太密）
+  const ms = milestoneEvents();
+  if(ms){ openEvent(ms, ()=>{ maybeRandomEvent(); }); }
+  else { maybeRandomEvent(); }
+}
+
+function maybeRandomEvent(){
+  if(state.ended) return;
+  if(Math.random()<0.38){
+    const ev = EVENTS[ri(0,EVENTS.length-1)];
+    openEvent(ev, ()=>postYearCheck());
+  } else postYearCheck();
+}
+
+function postYearCheck(){
+  if(state.health<=0){ endGame('ill'); return; }
+  if(state.age>=80){ endGame('old'); return; }
+}
+
+/* ---------- 事件弹窗 ---------- */
+let pendingAfter=null;
+function openEvent(ev, after){
+  pendingAfter=after;
+  $('#evTitle').textContent=ev.t;
+  $('#evText').textContent=ev.x;
+  const box=$('#evChoices'); box.innerHTML='';
+  ev.c.forEach(ch=>{
+    const b=document.createElement('button');
+    b.className='choice';
+    b.innerHTML=`${ch.l}<small>${ch.s}</small>`;
+    b.onclick=()=>{
+      sfx();
+      applyEffects(ch.e||{});
+      if(ch.set){ Object.assign(state, ch.set); if(ch.set.income!==undefined) state.income=ch.set.income; if(ch.set.grad!==undefined) state.flags.grad=true; if(ch.set.retired!==undefined) state.flags.retired=true; if(ch.set.married!==undefined) state.flags.married=ch.set.married; if(ch.set.child!==undefined) state.flags.child=true; }
+      pushLog(`【${ev.t}】${ch.l}`);
+      $('#eventModal').classList.add('hidden');
+      renderHUD(); save();
+      const cb=pendingAfter; pendingAfter=null; if(cb) cb();
+    };
+    box.appendChild(b);
+  });
+  $('#eventModal').classList.remove('hidden');
+}
+function applyEffects(e){
+  if(e.health) state.health=clamp(state.health+e.health,0,100);
+  if(e.happy)  state.happy =clamp(state.happy+e.happy,0,100);
+  if(e.network)state.network=clamp(state.network+e.network,0,100);
+  if(e.energy) state.energy=clamp(state.energy+e.energy,0,100);
+  if(e.skill)  state.skill=clamp(state.skill+e.skill,0,100);
+  if(e.rep)    state.rep=clamp(state.rep+e.rep,0,100);
+  if(e.money)  state.money+=e.money;
+}
+
+/* ---------- 日记 ---------- */
+function pushLog(text){
+  state.log.unshift({age:state.age, text});
+  if(state.log.length>60) state.log.pop();
+  renderLog();
+}
+function renderLog(){
+  const l=$('#logList'); if(!l) return;
+  l.innerHTML = state.log.map(i=>`<div class="log-item"><span class="yr">${i.age}岁</span>${i.text}</div>`).join('');
+}
+
+/* ============================================================
+   结算
+   ============================================================ */
+function endGame(reason){
+  state.ended=true; save();
+  const fam = (state.flags.married?'已成家':'单身')+(state.flags.child?' · 有子女':'');
+  let score = state.money/20000*20 + state.health*0.5 + state.happy*0.6 + state.network*0.4 + state.rep*0.3;
+  score = Math.round(clamp(score,0,200));
+  const grade = score>=150?'圆满人生':score>=110?'充实人生':score>=70?'平凡但真实':score>=40?'跌宕起伏':'坎坷一生';
+
+  $('#endTitle').textContent = reason==='ill' ? `人生定格在 ${state.age} 岁` : `走完了 ${state.age} 岁的一生`;
+  const stats=[
+    {n:fmt(state.money),l:'最终资产'},
+    {n:state.health+'%',l:'健康留存'},
+    {n:state.happy+'%',l:'快乐指数'},
+    {n:state.network+'%',l:'人脉广度'},
+    {n:state.rep,l:'社会声望'},
+    {n:fam,l:'家庭'},
+  ];
+  $('#endStats').innerHTML = stats.map(s=>`<div class="end-stat"><div class="n">${s.n}</div><div class="l">${s.l}</div></div>`).join('');
+
+  let v = `你以「${state.identity.name}」的身份，走过了 ${state.age-state.identity.base.age} 个春秋。`;
+  if(reason==='ill') v += `身体在岁月里悄悄透支，你比很多人更早谢幕——但认真活过的每一天都算数。`;
+  else v += `从青涩到迟暮，你在柴米油盐里把日子过成了自己的样子。`;
+  v += `\n\n综合评分 ${score} ｜ ${grade}。`;
+  if(state.flags.grad) v+=' 你完成了学业，迈向社会；';
+  if(state.flags.child) v+=' 你亲手把一个小生命抚养成人；';
+  if(state.rep>=60) v+=' 街坊邻里都念你的好。';
+  else if(state.money>=200000) v+=' 你攒下了让人安心的底气。';
+  else v+=' 平凡之中，也有细碎的安稳与温柔。';
+  $('#endVerdict').textContent=v;
+  show('endScreen');
+  localStorage.removeItem(SAVE_KEY);
+  if(bgmOn) {/* 渐弱留白 */ }
+}
+function shareText(){
+  return `【平民宇宙·人生模拟】\n身份：${state.identity.name}\n寿命：${state.age}岁\n资产：¥${fmt(state.money)}\n健康${state.health}% 快乐${state.happy}% 人脉${state.network}% 声望${state.rep}\n家庭：${(state.flags.married?'已成家':'单身')+(state.flags.child?'·有子女':'')}\n——你在柴米油盐里，过好了自己的一生。`;
+}
+
+/* ============================================================
+   存档
+   ============================================================ */
+function save(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }catch(e){} }
+function loadSave(){ try{ const s=localStorage.getItem(SAVE_KEY); return s?JSON.parse(s):null; }catch(e){ return null; } }
+
+/* ============================================================
+   屏幕切换
+   ============================================================ */
+function show(id){
+  ['startScreen','identityScreen','gameScreen','endScreen'].forEach(s=>$('#'+s).classList.add('hidden'));
+  $('#'+id).classList.remove('hidden');
+}
+
+/* ============================================================
+   身份选择 UI
+   ============================================================ */
+let picked=null;
+function renderIdentities(){
+  const g=$('#idGrid'); g.innerHTML='';
+  IDENTITIES.forEach(id=>{
+    const b=document.createElement('div');
+    b.className='id-card';
+    b.innerHTML=`<div class="id-ico">${id.ico}</div>
+      <div class="id-name">${id.name}</div>
+      <div class="id-desc">${id.desc}</div>
+      <div class="id-stats">
+        <span>起始 <b>${id.base.age}</b>岁</span>
+        <span>存款 <b>¥${fmt(id.base.money)}</b></span>
+        <span>健康 <b>${id.base.health}</b></span>
+        <span>快乐 <b>${id.base.happy}</b></span>
+      </div>`;
+    b.onclick=()=>{ picked=id; document.querySelectorAll('.id-card').forEach(x=>x.classList.remove('sel')); b.classList.add('sel');
+      const sb=$('#startLifeBtn'); sb.disabled=false; sb.style.opacity=1; sfx(); };
+    g.appendChild(b);
+  });
+}
+
+/* ============================================================
+   广告位（预留，不影响主流程，仅轮换演示）
+   ============================================================ */
+const ADS=[
+  {e:'🛰️',t:'平民智城 · 全息家居套餐上线',s:'演示广告位 · 点击了解更多'},
+  {e:'🤖',t:'家用智能助手 · 一句话搞定生活',s:'演示广告位 · 点击了解更多'},
+  {e:'💡',t:'零碳能源 · 家庭光储一体方案',s:'演示广告位 · 点击了解更多'},
+  {e:'🏠',t:'温馨智居 · 整租合租皆可',s:'演示广告位 · 点击了解更多'},
+  {e:'🌐',t:'平民宇宙 · 你的人生你做主',s:'演示广告位 · 点击了解更多'},
+  {e:'🚀',t:'低空出行 · 社区无人机配送',s:'演示广告位 · 点击了解更多'},
+];
+let adIdx=0;
+function rotateAd(){
+  adIdx=(adIdx+1)%ADS.length; const a=ADS[adIdx];
+  $('#adEmoji').textContent=a.e; $('#adText').textContent=a.t; $('#adSub').textContent=a.s;
+}
+$('#ad').onclick=()=>toast('（演示广告）感谢观看，不打扰你的人生 ✦');
+
+/* ============================================================
+   背景音乐：Web Audio 程序化生成（无需外部音频文件）
+   ============================================================ */
+let actx=null, master=null, bgmOn=false, bgmGain=0.22, schedTimer=null, nextNote=0, beat=0;
+const CHORDS=[[261.63,329.63,392.00,493.88],[220.00,261.63,329.63,392.00],
+              [174.61,220.00,261.63,349.23],[196.00,246.94,293.66,392.00]];
+function initAudio(){
+  if(actx) return;
+  try{ actx=new (window.AudioContext||window.webkitAudioContext)();
+    master=actx.createGain(); master.gain.value=0; master.connect(actx.destination);
+  }catch(e){ actx=null; }
+}
+function playNote(freq,t,dur,type,g){
+  if(!actx) return;
+  const o=actx.createOscillator(), gn=actx.createGain();
+  o.type=type; o.frequency.value=freq;
+  gn.gain.setValueAtTime(0,t);
+  gn.gain.linearRampToValueAtTime(g,t+0.04);
+  gn.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(gn); gn.connect(master); o.start(t); o.stop(t+dur+0.05);
+}
+function scheduler(){
+  if(!actx) return;
+  while(nextNote < actx.currentTime+0.2){
+    const chord=CHORDS[Math.floor(beat/4)%CHORDS.length];
+    // 低音垫
+    if(beat%4===0) playNote(chord[0]/2, nextNote, 2.0, 'sine', 0.12);
+    // 轻柔琶音
+    const n=chord[beat%4];
+    playNote(n, nextNote, 0.9, 'triangle', 0.10);
+    if(beat%2===0) playNote(n*2, nextNote+0.02, 0.5, 'sine', 0.05);
+    nextNote += 0.5; beat++;
+  }
+}
+function startBGM(){
+  initAudio(); if(!actx) { toast('当前环境不支持音频'); return; }
+  if(actx.state==='suspended') actx.resume();
+  bgmOn=true; $('#musicBtn').textContent='⏸';
+  master.gain.cancelScheduledValues(actx.currentTime);
+  master.gain.linearRampToValueAtTime(bgmGain*(+$('#vol').value/100||0.55), actx.currentTime+0.6);
+  nextNote=actx.currentTime+0.1; beat=0;
+  if(!schedTimer) schedTimer=setInterval(scheduler,90);
+}
+function stopBGM(){
+  bgmOn=false; $('#musicBtn').textContent='🎵';
+  if(master) master.gain.linearRampToValueAtTime(0, actx.currentTime+0.4);
+}
+function sfx(){
+  if(!actx) return; if(actx.state==='suspended') actx.resume();
+  const t=actx.currentTime; playNote(660,t,0.12,'square',0.05); playNote(880,t+0.05,0.10,'square',0.04);
+}
+$('#musicBtn').onclick=()=>{ if(bgmOn) stopBGM(); else startBGM(); };
+$('#vol').oninput=()=>{ if(master&&bgmOn) master.gain.linearRampToValueAtTime(bgmGain*(+$('#vol').value/100), actx.currentTime+0.1); };
+
+/* ============================================================
+   3D 场景（Three.js）
+   ============================================================ */
+let renderer,scene,camera,clock,avatar,moodGroup,currentScene=null,threeReady=false;
+let camTheta=0.7, camPhi=1.02, camRadius=7, camTarget=null;
+let dragging=false, lastX=0, lastY=0, idleT=0;
+
+function tryLoadThree(){
+  // 本地优先（离线/内网可用），其次 CDN，最后 2D 降级
+  const sources=[
+    'three.min.js',
+    'https://unpkg.com/three@0.160.0/build/three.min.js',
+    'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'
+  ];
+  let i=0;
+  (function load(){
+    if(window.THREE && THREE.WebGLRenderer){ initThree(); return; }
+    if(i>=sources.length){ console.warn('Three.js 加载失败，使用 2D 降级背景'); $('#loading').classList.add('hidden'); fallbackBG(); return; }
+    const s=document.createElement('script');
+    s.src=sources[i++];
+    s.onload=()=> (window.THREE&&THREE.WebGLRenderer)?initThree():load();
+    s.onerror=load;
+    document.head.appendChild(s);
+  })();
+}
+function fallbackBG(){
+  $('#loading').classList.add('hidden');
+  const c=$('#scene'); const g=c.getContext('2d');
+  function draw(){ const w=c.width=innerWidth,h=c.height=innerHeight;
+    const grd=g.createLinearGradient(0,0,0,h); grd.addColorStop(0,'#3a4a55'); grd.addColorStop(1,'#1a242c');
+    g.fillStyle=grd; g.fillRect(0,0,w,h); }
+  draw(); addEventListener('resize',draw);
+}
+
+function initThree(){
+  if(threeReady) return; threeReady=true;
+  const canvas=$('#scene');
+  try{
+    renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  }catch(err){
+    console.warn('WebGL 不可用，降级为 2D 背景',err);
+    threeReady=false; $('#loading').classList.add('hidden'); fallbackBG(); return;
+  }
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x9fc6d8);
+  scene.fog=new THREE.Fog(0x9fc6d8,30,90);
+  camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,300);
+  camTarget=new THREE.Vector3(0,0.9,0);   // THREE 就绪后再创建，避免顶层崩溃；取景对准人物上半身
+  clock=new THREE.Clock();
+  // 光照
+  const amb=new THREE.AmbientLight(0xffffff,0.55); scene.add(amb);
+  const hemi=new THREE.HemisphereLight(0xffffff,0x556b4f,0.5); scene.add(hemi);
+  window._amb=amb; window._hemi=hemi;
+  window._sun=new THREE.DirectionalLight(0xffffff,1.1); window._sun.position.set(12,20,8);
+  window._sun.castShadow=true; window._sun.shadow.mapSize.set(1024,1024);
+  window._sun.shadow.camera.left=-25; window._sun.shadow.camera.right=25;
+  window._sun.shadow.camera.top=25; window._sun.shadow.camera.bottom=-25;
+  window._sun.shadow.camera.updateProjectionMatrix();
+  scene.add(window._sun);
+  avatar=createAvatar(); scene.add(avatar);
+  createHoloRig();   // 悬浮全息屏 + 智能伙伴
+  setScene(state?state.location:'home');
+  bindOrbit();
+  addEventListener('resize',onResize);
+  animate();
+  $('#loading').classList.add('hidden');
+}
+
+function onResize(){
+  if(!renderer) return;
+  camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+}
+
+/* ---- 基础几何助手 ---- */
+function box(w,h,d,color){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color})); m.castShadow=true; m.receiveShadow=true; return m; }
+function cyl(rt,rb,h,color,seg){ const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg||12),new THREE.MeshLambertMaterial({color})); m.castShadow=true; m.receiveShadow=true; return m; }
+function sph(r,color){ const m=new THREE.Mesh(new THREE.SphereGeometry(r,18,18),new THREE.MeshLambertMaterial({color})); m.castShadow=true; return m; }
+function cone(r,h,color){ const m=new THREE.Mesh(new THREE.ConeGeometry(r,h,10),new THREE.MeshLambertMaterial({color})); m.castShadow=true; return m; }
+
+/* ---- 角色 ---- */
+function createAvatar(opts){
+  opts=opts||{};
+  const skin = opts.skin || 0xf3cba4;
+  const hairC= opts.hair || 0x241910;
+  const top  = opts.top  || 0xc8402f;
+  const bot  = opts.bot  || 0x3a4756;
+  const shoeC= opts.shoe || 0x202327;
+  const g=new THREE.Group();
+  const add=(m)=>{ if(m){ m.castShadow=true; m.receiveShadow=true; g.add(m);} return m; };
+
+  // 腿（大腿 + 小腿 + 脚），自然站姿
+  function buildLeg(side){
+    const lg=new THREE.Group();
+    const thigh=cyl(0.17,0.13,0.46,bot,14); thigh.position.y=0.69;
+    const shin =cyl(0.13,0.1,0.44,bot,14);  shin.position.y=0.24;
+    const ankle=cyl(0.1,0.1,0.08,skin,10);  ankle.position.y=0.04;
+    const foot =box(0.18,0.11,0.34,shoeC);  foot.position.set(0,0.03,0.08);
+    lg.add(thigh,shin,ankle,foot); lg.position.x=side*0.17; return lg;
+  }
+  add(buildLeg(-1)); add(buildLeg(1));
+
+  // 髋 / 腰 / 胸（胸-腰-臀曲线）
+  add(cyl(0.34,0.3,0.34,bot,16)).position.y=0.94;
+  add(cyl(0.28,0.34,0.36,top,16)).position.y=1.2;
+  const chest=add(cyl(0.36,0.3,0.62,top,18)); chest.position.y=1.52; chest.scale.set(1.06,1,0.8);
+  // 肩（横椭圆柱，向左右展开）
+  const shoulder=add(cyl(0.34,0.34,0.96,top,18)); shoulder.rotation.z=Math.PI/2; shoulder.position.y=1.86; shoulder.scale.set(1,1,0.6);
+
+  // 手臂（上臂 + 前臂 + 手，肘部微弯）
+  function buildArm(side){
+    const ag=new THREE.Group();
+    const up=cyl(0.12,0.1,0.5,top,12); up.position.y=1.62; up.rotation.z=side*0.12;
+    const fore=cyl(0.1,0.08,0.48,skin,12); fore.position.set(side*0.05,1.12,0.05); fore.rotation.z=side*0.2;
+    const hand=sph(0.11,skin); hand.scale.set(1,1.15,0.7); hand.position.set(side*0.06,0.86,0.07);
+    const thumb=sph(0.045,skin); thumb.position.set(0,0.9,0.13);
+    ag.add(up,fore,hand,thumb); ag.position.x=side*0.52; return ag;
+  }
+  add(buildArm(-1)); add(buildArm(1));
+
+  // 脖子
+  add(cyl(0.13,0.16,0.2,skin,10)).position.y=2.04;
+  // 头（蛋形）+ 下颌，更立体
+  const head=add(sph(0.46,skin)); head.scale.set(1,1.06,1.02); head.position.y=2.34;
+  const jaw=add(sph(0.34,skin)); jaw.scale.set(1,0.7,0.85); jaw.position.set(0,2.18,0.16);
+  // 耳朵
+  const earL=add(sph(0.1,skin)); earL.scale.set(0.45,1,0.8); earL.position.set(-0.47,2.34,0);
+  const earR=add(sph(0.1,skin)); earR.scale.set(0.45,1,0.8); earR.position.set(0.47,2.34,0);
+  // 鼻（鼻梁 + 鼻尖）
+  add(box(0.07,0.16,0.07,skin)).position.set(0,2.3,0.44);
+  const noseTip=add(sph(0.07,skin)); noseTip.position.set(0,2.24,0.5);
+  // 眼睛（眼白 + 虹膜 + 瞳孔 + 高光，更有神）
+  function eye(side){
+    const eg=new THREE.Group();
+    const wl=sph(0.12,0xf7f4ee); wl.scale.set(1,0.85,0.7);
+    const ir=sph(0.075,0x4a3320); ir.position.z=0.06;
+    const pu=sph(0.04,0x120d0a); pu.position.z=0.09;
+    const hi=sph(0.018,0xffffff); hi.position.set(0.02,0.03,0.12);
+    eg.add(wl,ir,pu,hi); eg.position.set(side*0.18,2.42,0.42); g.add(eg);
+  }
+  eye(-1); eye(1);
+  // 眉毛（自然弧）
+  const brL=add(box(0.16,0.03,0.04,hairC)); brL.position.set(-0.18,2.55,0.46); brL.rotation.z=0.1;
+  const brR=add(box(0.16,0.03,0.04,hairC)); brR.position.set(0.18,2.55,0.46); brR.rotation.z=-0.1;
+  // 嘴（微笑弧）
+  const mouth=new THREE.Mesh(new THREE.TorusGeometry(0.1,0.022,8,16,Math.PI), new THREE.MeshLambertMaterial({color:0x9c4a3c}));
+  mouth.rotation.z=Math.PI; mouth.position.set(0,2.16,0.46); g.add(mouth);
+  // 腮红（增添生动）
+  const cheekMat=new THREE.MeshLambertMaterial({color:0xe89a8a,transparent:true,opacity:0.3});
+  [-0.24,0.24].forEach(x=>{ const c=new THREE.Mesh(new THREE.SphereGeometry(0.1,12,12),cheekMat); c.scale.set(1,0.6,0.4); c.position.set(x,2.26,0.42); g.add(c); });
+
+  // 头发：后壳 + 顶发 + 刘海 + 鬓角，茂密自然，杜绝“地中海”
+  const hairMat=new THREE.MeshLambertMaterial({color:hairC});
+  const helmet=new THREE.Mesh(new THREE.SphereGeometry(0.5,20,16, Math.PI*0.15, Math.PI*1.7, 0, Math.PI*0.78), hairMat);
+  helmet.position.set(0,2.34,0); helmet.castShadow=true; g.add(helmet);
+  const crown=new THREE.Mesh(new THREE.SphereGeometry(0.49,18,14,0,Math.PI*2,0,Math.PI*0.42), hairMat);
+  crown.position.set(0,2.36,0); crown.castShadow=true; g.add(crown);
+  const fr1=new THREE.Mesh(new THREE.SphereGeometry(0.4,16,12,-Math.PI*0.5,Math.PI*0.55,0,Math.PI*0.34),hairMat);
+  fr1.position.set(-0.02,2.5,0.04); fr1.castShadow=true; g.add(fr1);
+  const fr2=new THREE.Mesh(new THREE.SphereGeometry(0.34,16,12,Math.PI*0.02,Math.PI*0.5,0,Math.PI*0.32),hairMat);
+  fr2.position.set(0.12,2.5,0.05); fr2.castShadow=true; g.add(fr2);
+  const sideL=new THREE.Mesh(new THREE.SphereGeometry(0.16,12,10,0,Math.PI*2,0,Math.PI*0.95),hairMat);
+  sideL.position.set(-0.4,2.3,0.05); sideL.scale.set(0.5,1,0.6); sideL.castShadow=true; g.add(sideL);
+  const sideR=sideL.clone(); sideR.position.x=0.4; g.add(sideR);
+
+  // 服装细节：衣领 + 腰带
+  const collar=new THREE.Mesh(new THREE.TorusGeometry(0.15,0.035,8,16), new THREE.MeshLambertMaterial({color:0xf2ede2}));
+  collar.rotation.x=Math.PI/2; collar.position.y=1.98; g.add(collar);
+  const belt=new THREE.Mesh(new THREE.TorusGeometry(0.32,0.05,8,18), new THREE.MeshLambertMaterial({color:0x2a2f36}));
+  belt.rotation.x=Math.PI/2; belt.position.y=1.02; g.add(belt);
+
+  g.position.y=-0.05;
+  g.userData.bob=0;
+  return g;
+}
+
+/* ============================================================
+   全息 / 智能化交互系统：悬浮电子屏 · 智能伙伴 · 霓虹网格 · 全息投影
+   ============================================================ */
+let holoScreen=null, companion=null, holoCanvas=null, holoCtx=null, holoTex=null;
+let billboards=[], holoLabels=[], _v1=null, holoLastT=0;
+
+function rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+// 生成全息文字贴图（用于场景标签 / 漂浮广告牌）
+function makeLabelTexture(text){
+  const c=document.createElement('canvas'); c.width=256; c.height=64;
+  const x=c.getContext('2d'); x.clearRect(0,0,256,64);
+  x.fillStyle='rgba(8,28,44,.55)'; rr(x,2,2,252,60,12); x.fill();
+  x.strokeStyle='rgba(120,225,255,.9)'; x.lineWidth=2; rr(x,2,2,252,60,12); x.stroke();
+  x.fillStyle='#cdefff'; x.font='bold 26px sans-serif'; x.textAlign='center'; x.textBaseline='middle';
+  x.fillText(text,128,34);
+  return new THREE.CanvasTexture(c);
+}
+
+// 悬浮全息电子屏：实时显示人物状态，半透明玻璃态、始终朝向镜头
+function createHoloRig(){
+  if(holoScreen) return;
+  const c=document.createElement('canvas'); c.width=360; c.height=210;
+  holoCanvas=c; holoCtx=c.getContext('2d'); holoTex=new THREE.CanvasTexture(c);
+  const screen=new THREE.Mesh(new THREE.PlaneGeometry(1.7,1.0),
+    new THREE.MeshBasicMaterial({map:holoTex,transparent:true,opacity:0.92,side:THREE.DoubleSide,depthWrite:false}));
+  const glow=new THREE.Mesh(new THREE.PlaneGeometry(1.95,1.2),
+    new THREE.MeshBasicMaterial({color:0x2aa8d8,transparent:true,opacity:0.14,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));
+  glow.position.z=-0.03;
+  holoScreen=new THREE.Group(); holoScreen.add(glow,screen); holoScreen.renderOrder=5; scene.add(holoScreen);
+  // 智能伙伴：悬浮光球 + 光环，绕角色飞行
+  const orb=new THREE.Mesh(new THREE.IcosahedronGeometry(0.2,0),
+    new THREE.MeshBasicMaterial({color:0x7fe9ff,transparent:true,opacity:0.92}));
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(0.32,0.02,8,32),
+    new THREE.MeshBasicMaterial({color:0x6fe0ff,transparent:true,opacity:0.7})); ring.rotation.x=Math.PI/2;
+  companion=new THREE.Group(); companion.add(orb,ring); companion.userData={ang:0}; scene.add(companion);
+  updateHoloScreen();
+}
+
+function updateHoloScreen(){
+  if(!holoCtx) return;
+  const x=holoCtx, W=360, H=210;
+  x.clearRect(0,0,W,H);
+  x.fillStyle='rgba(8,28,44,.62)'; rr(x,4,4,W-8,H-8,16); x.fill();
+  x.strokeStyle='rgba(120,225,255,.9)'; x.lineWidth=3; rr(x,4,4,W-8,H-8,16); x.stroke();
+  x.textAlign='left'; x.textBaseline='alphabetic';
+  x.fillStyle='#bfefff'; x.font='bold 22px sans-serif'; x.fillText('平民智城 · 人生控制台', 22, 40);
+  x.strokeStyle='rgba(120,225,255,.4)'; x.lineWidth=1; x.beginPath(); x.moveTo(22,52); x.lineTo(W-22,52); x.stroke();
+  const L = state ? [
+    ['年龄', state.age+' 岁'], ['资产', '¥'+fmt(state.money)],
+    ['健康', Math.round(state.health)+''], ['快乐', Math.round(state.happy)+''],
+    ['人脉', Math.round(state.network)+''], ['精力', Math.round(state.energy)+'']
+  ] : [['状态','待命'],['系统','平民智城 v3'],['连接','全息在线'],['AI','智能就绪'],['场景','—'],['年份','—']];
+  for(let i=0;i<L.length;i++){ const col=i%3, row=Math.floor(i/3), cx=22+col*112, cy=92+row*52;
+    x.fillStyle='#7fd8ff'; x.font='13px sans-serif'; x.fillText(L[i][0], cx, cy);
+    x.fillStyle='#eaffff'; x.font='bold 22px sans-serif'; x.fillText(L[i][1], cx, cy+24); }
+  // 动态扫描线
+  x.fillStyle='rgba(120,225,255,.10)';
+  const sy=((Date.now()/18)% (H-8))+4; x.fillRect(8, sy, W-16, 3);
+  if(holoTex) holoTex.needsUpdate=true;
+}
+
+// 霓虹网格 + 漂浮全息广告牌，营造智能城市氛围
+function addHoloAmbience(){
+  const grid=new THREE.GridHelper(60,30,0x3aa6c8,0x2a6f88);
+  if(grid.material){ grid.material.opacity=0.16; grid.material.transparent=true; }
+  grid.position.y=0.02; currentScene.add(grid);
+  const msgs=['智能交通','清洁能源','全息社区','AI 助手','数字孪生','低空物流'];
+  for(let i=0;i<3;i++){
+    const t=makeLabelTexture(msgs[(Math.random()*msgs.length)|0]);
+    const p=new THREE.Mesh(new THREE.PlaneGeometry(2.2,0.55),
+      new THREE.MeshBasicMaterial({map:t,transparent:true,side:THREE.DoubleSide,depthWrite:false}));
+    p.position.set((Math.random()-0.5)*16, 4+Math.random()*2.2, (Math.random()-0.5)*12);
+    p.userData.bob=Math.random()*6; p.userData.spin=(Math.random()-0.5)*0.3;
+    currentScene.add(p); billboards.push(p);
+    animItems.push({t:0,update(dt,tt){ p.position.y += Math.sin(tt*0.6+p.userData.bob)*0.0025; p.rotation.y+=p.userData.spin*dt; }});
+  }
+}
+
+/* ---- 场景构建 ---- */
+function bindOrbit(){
+  const v=$('#view');
+  v.addEventListener('pointerdown',e=>{ dragging=true; lastX=e.clientX; lastY=e.clientY; idleT=0; v.setPointerCapture(e.pointerId); });
+  v.addEventListener('pointermove',e=>{ if(!dragging) return; const dx=e.clientX-lastX, dy=e.clientY-lastY; lastX=e.clientX; lastY=e.clientY;
+    camTheta-=dx*0.005; camPhi=clamp(camPhi-dy*0.005,0.25,1.35); idleT=0; });
+  v.addEventListener('pointerup',e=>{ dragging=false; });
+  v.addEventListener('wheel',e=>{ camRadius=clamp(camRadius*(1+e.deltaY*0.001),6,20); e.preventDefault(); },{passive:false});
+}
+function beginLife(identity){
+  state=newState(identity);
+  show('gameScreen');
+  renderTabs(); renderActions(); renderHUD(); stageLabel(); renderLog();
+  if(threeReady){ setScene(state.location); }
+  $('#volWrap').classList.remove('hidden');
+  // 首条日记
+  pushLog(`你以「${identity.name}」的身份，在 ${identity.base.age} 岁开启了人生。`);
+  save();
+  // 首次交互尝试起音乐（浏览器策略需手势）
+  startBGM();
+}
+
+function bindUI(){
+  $('#newBtn').onclick=()=>{ sfxAttempt(); show('identityScreen'); renderIdentities(); };
+  $('#contBtn').onclick=()=>{ const s=loadSave(); if(s){ state=s; picked=s.identity; show('gameScreen'); renderTabs(); renderActions(); renderHUD(); stageLabel(); renderLog(); if(threeReady)setScene(state.location); $('#volWrap').classList.remove('hidden'); } };
+  $('#startLifeBtn').onclick=()=>{ if(picked) beginLife(picked); };
+  $('#backStartBtn').onclick=()=>show('startScreen');
+  $('#logToggle').onclick=()=>$('#logSheet').classList.remove('hidden');
+  $('#closeLog').onclick=()=>$('#logSheet').classList.add('hidden');
+  $('#logSheet').onclick=e=>{ if(e.target.id==='logSheet')$('#logSheet').classList.add('hidden'); };
+  $('#replayBtn').onclick=()=>{ show('identityScreen'); renderIdentities(); picked=null; const sb=$('#startLifeBtn'); sb.disabled=true; sb.style.opacity=.5; };
+  $('#copyBtn').onclick=()=>{ const t=shareText(); navigator.clipboard&&navigator.clipboard.writeText(t).then(()=>toast('人生总结已复制 ✦'),()=>toast('复制失败，请手动选择')); };
+  setupEnvButton();
+  setupControls();
+  setInterval(rotateAd,5000);
+  // 控制面板折叠：点 ▾ 按钮收起/展开，露出更多 3D 画面
+  const togglePanel=()=>{ const p=$('#panel'); const c=p.classList.toggle('collapsed'); $('#panelToggle').textContent=c?'▾':'▴'; };
+  $('#panelToggle').onclick=(e)=>{ e.stopPropagation(); togglePanel(); };
+  // 面板悬浮拖动：按住头部可把控制台拖到任意位置；双击头部复位；默认带轻微浮动
+  const phead=$('#phead'), ppanel=$('#panel');
+  let pdrag=false, pmoved=false, psx=0, psy=0, pox=0, poy=0;
+  const pDown=(e)=>{
+    if(e.target.id==='panelToggle') return;
+    const pt=e.touches?e.touches[0]:e; if(!pt) return;
+    const r=ppanel.getBoundingClientRect();
+    ppanel.style.left=r.left+'px'; ppanel.style.top=r.top+'px'; ppanel.style.right='auto'; ppanel.style.bottom='auto'; ppanel.style.width=r.width+'px';
+    ppanel.classList.add('floating'); ppanel.classList.remove('float-on'); ppanel.classList.add('dragging');
+    psx=pt.clientX; psy=pt.clientY; pox=pt.clientX-r.left; poy=pt.clientY-r.top; pmoved=false; pdrag=true;
+    ppanel.style.userSelect='none';
+    try{ if(phead.setPointerCapture && e.pointerId!=null) phead.setPointerCapture(e.pointerId); }catch(_){}
+  };
+  const pMove=(e)=>{
+    if(!pdrag) return;
+    const pt=e.touches?e.touches[0]:e; if(!pt) return;
+    if(Math.abs(pt.clientX-psx)>5||Math.abs(pt.clientY-psy)>5) pmoved=true;
+    let nx=pt.clientX-pox, ny=pt.clientY-poy;
+    const w=ppanel.offsetWidth, h=ppanel.offsetHeight;
+    nx=Math.max(6, Math.min(nx, innerWidth-w-6)); ny=Math.max(6, Math.min(ny, innerHeight-h-6));
+    ppanel.style.left=nx+'px'; ppanel.style.top=ny+'px';
+    if(e.cancelable) e.preventDefault();
+  };
+  const pUp=()=>{ if(!pdrag) return; pdrag=false; ppanel.classList.remove('dragging'); ppanel.classList.add('float-on'); ppanel.style.userSelect=''; };
+  phead.addEventListener('pointerdown', pDown);
+  window.addEventListener('pointermove', pMove, {passive:false});
+  window.addEventListener('pointerup', pUp);
+  phead.addEventListener('dblclick', ()=>{
+    ppanel.classList.remove('floating'); ppanel.style.left=''; ppanel.style.top=''; ppanel.style.right=''; ppanel.style.bottom=''; ppanel.style.width='';
+    toast('控制台已复位到默认位置 ✦');
+  });
+  ppanel.classList.add('float-on');
+}
+function sfxAttempt(){ initAudio(); if(actx&&actx.state==='suspended')actx.resume(); }
+
+window.addEventListener('load',()=>{
+  bindUI();
+  const s=loadSave();
+  if(s){ $('#contBtn').classList.remove('hidden'); }
+  tryLoadThree(); // 若已加载 Three 则初始化；否则降级
+  // 若 2.5s 后仍未就绪（网络慢），先隐藏 loading 用降级背景
+  setTimeout(()=>{ if(!threeReady) $('#loading').classList.add('hidden'); }, 4000);
+});
+
+/* ============================================================
+   场景扩充：更丰富的环境 + 动态细节 + 新场景 + 昼夜
+   （以下函数以同名覆盖原实现，零风险）
+   ============================================================ */
+let animItems=[];   // 每帧动画项 {update(dt,t)}
+let isNight=false;  // 昼夜状态
+let keys={}, joy={x:0,y:0}, nearbySpot=null, exploreDist=0, _camTmp=null;
+const BOUNDS={home:{x:7,z:7},office:{x:10,z:10},street:{x:12,z:11},park:{x:12,z:12},nightmarket:{x:13,z:7},mall:{x:9,z:9}};
+
+/* ---- 公共道具助手 ---- */
+function regLamp(x,y,z,color,dist,inten){
+  const bulb=new THREE.Mesh(new THREE.SphereGeometry(0.22,10,10),new THREE.MeshBasicMaterial({color}));
+  bulb.position.set(x,y,z); currentScene.add(bulb);
+  const light=new THREE.PointLight(color,inten,dist||14); light.position.set(x,y,z); currentScene.add(light);
+  currentScene.userData.lamps.push({light,bulb,inten:inten||1});
+  return {bulb,light};
+}
+function regWindow(x,y,z,ry,w,h){
+  const m=new THREE.MeshLambertMaterial({color:0x86a6bd,emissive:0xffd27a,emissiveIntensity:0});
+  const win=new THREE.Mesh(new THREE.BoxGeometry(w,h,0.08),m); win.position.set(x,y,z); win.rotation.y=ry||0; currentScene.add(win);
+  currentScene.userData.windows.push(m); return win;
+}
+function setDayEnv(bg,sun,amb){
+  const ud=currentScene.userData;
+  ud.dayBg=new THREE.Color(bg); ud.daySun=sun; ud.dayAmb=amb;
+  if(scene.background) scene.background.set(bg);
+  if(scene.fog) scene.fog.color.set(bg);
+  if(window._sun) window._sun.intensity=sun;
+  if(window._amb) window._amb.intensity=amb;
+  if(window._hemi) window._hemi.intensity=amb*0.9;
+}
+function makePlant(x,z,s){
+  s=s||1; const g=new THREE.Group();
+  const pot=cyl(0.4*s,0.5*s,0.6*s,0xb5651d,12); pot.position.y=0.3*s;
+  const trunk=cyl(0.12*s,0.16*s,1.2*s,0x6b4a2a,8); trunk.position.y=1.0*s;
+  const f1=cone(1.0*s,2.0*s,0x4a7c59); f1.position.y=2.0*s;
+  const f2=cone(0.7*s,1.4*s,0x5d9468); f2.position.y=2.8*s;
+  g.add(pot,trunk,f1,f2); g.position.set(x,0,z); currentScene.add(g); return g;
+}
+function makeTree(x,z,s){
+  s=s||1; const g=new THREE.Group();
+  const trunk=cyl(0.3*s,0.4*s,2*s,0x6b4a2a,10); trunk.position.y=1*s;
+  const t1=sph(1.5*s,0x4a7c59); t1.position.y=3*s;
+  const t2=sph(1.1*s,0x5d9468); t2.position.set(0.8*s,3.6*s,-0.4*s);
+  g.add(trunk,t1,t2); g.position.set(x,0,z); currentScene.add(g); return g;
+}
+function makePicture(x,y,z,ry,color){
+  const g=new THREE.Group(); g.position.set(x,y,z); g.rotation.y=ry||0;
+  g.add(box(1.4,1.0,0.08,0x3a2a1a));
+  const p=box(1.1,0.75,0.04,color||0x9cc2d6); p.position.z=0.06; g.add(p);
+  currentScene.add(g);
+}
+function makeChair(x,z,ry,color){
+  const g=new THREE.Group(); const seat=box(1,0.2,1,color||0x2b2620); seat.position.y=0.5;
+  const back=box(1,1,0.2,color||0x2b2620); back.position.set(0,1,-0.4);
+  g.add(seat,back); g.position.set(x,0,z); g.rotation.y=ry||0; currentScene.add(g);
+}
+function makeCloud(x,y,z,s){
+  const m=new THREE.MeshBasicMaterial({color:0xffffff}); const g=new THREE.Group();
+  [[0,0,0,1.2],[1.2*s,0.2*s,0.2*s,0.9],[-1.1*s,-0.1*s,0.1*s,1.0]].forEach(p=>{
+    const sp=new THREE.Mesh(new THREE.SphereGeometry(p[3]*s,10,10),m); sp.position.set(p[0],p[1],p[2]); g.add(sp); });
+  g.position.set(x,y,z); currentScene.add(g);
+  animItems.push({g,update(dt){ g.position.x+=dt*0.5; if(g.position.x>42)g.position.x=-42; }});
+  return g;
+}
+function makeStars(){
+  const n=140, geo=new THREE.BufferGeometry(), pos=new Float32Array(n*3);
+  for(let i=0;i<n;i++){ const r=60+Math.random()*30, th=Math.random()*Math.PI*2, ph=Math.random()*Math.PI*0.5;
+    pos[i*3]=Math.cos(th)*Math.cos(ph)*r; pos[i*3+1]=20+Math.sin(ph)*r*0.6; pos[i*3+2]=Math.sin(th)*Math.cos(ph)*r; }
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const mat=new THREE.PointsMaterial({color:0xffffff,size:0.6,transparent:true,opacity:0});
+  const pts=new THREE.Points(geo,mat); currentScene.add(pts); currentScene.userData.stars=pts;
+}
+function makeLeaves(){
+  const n=70, geo=new THREE.BufferGeometry(), pos=new Float32Array(n*3), spd=new Float32Array(n);
+  for(let i=0;i<n;i++){ pos[i*3]=(Math.random()*2-1)*13; pos[i*3+1]=Math.random()*9; pos[i*3+2]=(Math.random()*2-1)*13; spd[i]=0.5+Math.random()*1.1; }
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const mat=new THREE.PointsMaterial({color:0xd98a3a,size:0.35});
+  const pts=new THREE.Points(geo,mat); currentScene.add(pts);
+  animItems.push({update(dt){ for(let i=0;i<n;i++){ pos[i*3+1]-=spd[i]*dt; pos[i*3]+=Math.sin((pos[i*3+1]+i)*0.6)*dt*0.4;
+    if(pos[i*3+1]<0){ pos[i*3+1]=9; pos[i*3]=(Math.random()*2-1)*13; pos[i*3+2]=(Math.random()*2-1)*13; } } geo.attributes.position.needsUpdate=true; }});
+}
+function makePerson(x,z,ry,sc,bodyCol){
+  const a=createAvatar(); a.position.set(x,0,z); a.rotation.y=ry||0; a.scale.setScalar(sc||1);
+  if(bodyCol){ a.traverse(o=>{ if(o.material&&o.material.color&&o.material.color.getHex&&o.material.color.getHex()===0xc8402f) o.material.color.set(bodyCol); }); }
+  currentScene.add(a); return a;
+}
+
+/* ---- 覆盖：清场 / 切场景 / 渲染循环 ---- */
+function clearScene(){
+  if(currentScene){ scene.remove(currentScene); currentScene.traverse(o=>{ if(o.geometry)o.geometry.dispose(); if(o.material){ if(Array.isArray(o.material))o.material.forEach(m=>m.dispose&&m.dispose()); else o.material.dispose&&o.material.dispose(); } }); }
+  currentScene=new THREE.Group();
+  currentScene.userData={lamps:[],windows:[],stars:null,dayBg:null,daySun:1.1,dayAmb:0.55,alwaysNight:false};
+  animItems=[]; billboards=[]; holoLabels=[];
+}
+function setScene(loc){
+  if(!threeReady) return;
+  clearScene();
+  if(loc==='home') buildHome();
+  else if(loc==='office') buildOffice();
+  else if(loc==='street') buildStreet();
+  else if(loc==='park') buildPark();
+  else if(loc==='nightmarket') buildNightMarket();
+  else if(loc==='mall') buildMall();
+  scene.add(currentScene);
+  avatar.position.set(0,0,0); avatar.visible=true;
+  nearbySpot=null;
+  setupSpots(loc);
+  addHoloAmbience();   // 霓虹网格 + 漂浮全息广告牌
+  setDayNight();
+  if(state && !state.ended){ renderActions(); stageLabel(); $('#pTitle').textContent='人生控制台'; }
+}
+function animate(){
+  requestAnimationFrame(animate);
+  if(!renderer) return;
+  const dt=clock.getDelta(), t=clock.elapsedTime;
+  updateMovement(dt);
+  if(avatar){ avatar.userData.bob+=dt; avatar.position.y=-0.05+Math.sin(avatar.userData.bob*1.5)*0.03; if(!avatar.userData.moving) avatar.rotation.y=Math.sin(avatar.userData.bob*0.4)*0.1; }
+  for(let i=0;i<animItems.length;i++){ try{ animItems[i].update(dt,t); }catch(e){} }
+  idleT+=dt; if(!dragging&&idleT>2.5) camTheta+=dt*0.06;
+  // 相机第三人称跟随角色
+  if(avatar){ if(!_camTmp)_camTmp=new THREE.Vector3(); camTarget.lerp(_camTmp.set(avatar.position.x, avatar.position.y+0.9, avatar.position.z), 0.18); }
+  const x=camTarget.x+camRadius*Math.sin(camPhi)*Math.sin(camTheta);
+  const y=camTarget.y+camRadius*Math.cos(camPhi);
+  const z=camTarget.z+camRadius*Math.sin(camPhi)*Math.cos(camTheta);
+  camera.position.lerp(new THREE.Vector3(x,y,z),0.12);
+  camera.lookAt(camTarget);
+  checkProximity();
+  // 全息装备更新：悬浮电子屏跟随角色并朝向镜头；智能伙伴绕飞；标签朝向镜头
+  if(holoScreen && avatar){
+    if(!_v1)_v1=new THREE.Vector3();
+    camera.updateMatrixWorld();
+    const e=camera.matrixWorld.elements;
+    _v1.set(e[0],e[1],e[2]); // 相机右向量
+    holoScreen.position.copy(avatar.position).addScaledVector(_v1,-2.7).add(new THREE.Vector3(0,2.5,0));
+    holoScreen.quaternion.copy(camera.quaternion);
+  }
+  if(companion && avatar){
+    companion.userData.ang+=dt*0.9;
+    const a=companion.userData.ang;
+    companion.position.set(avatar.position.x+Math.cos(a)*1.6, avatar.position.y+2.1+Math.sin(a*2)*0.2, avatar.position.z+Math.sin(a)*1.6);
+    companion.rotation.y+=dt*1.6; companion.rotation.x+=dt*0.7;
+  }
+  for(let i=0;i<holoLabels.length;i++){ holoLabels[i].quaternion.copy(camera.quaternion); }
+  if(t-holoLastT>0.35){ holoLastT=t; updateHoloScreen(); }
+  renderer.render(scene,camera);
+}
+
+/* ---- 覆盖：四个原场景（更丰富） ---- */
+function buildHome(){
+  setDayEnv(0xf3e2c7,1.05,0.55);
+  const floor=box(16,0.2,16,0xc9a878); floor.position.y=-0.1; currentScene.add(floor);
+  const rug=box(7,0.05,6,0xd8b48a); rug.position.set(0,0.02,0); currentScene.add(rug);
+  const wallMat=0xe9d8b8;
+  const w1=box(16,8,0.3,wallMat); w1.position.set(0,4,-8);
+  const w2=box(0.3,8,16,wallMat); w2.position.set(-8,4,0);
+  const w3=box(0.3,8,16,wallMat); w3.position.set(8,4,0);
+  const ceil=box(16,0.3,16,0xf3ead6); ceil.position.set(0,8,0);
+  [w1,w2,w3,ceil].forEach(w=>currentScene.add(w));
+  regWindow(0,4.5,-7.8,0,4,3);
+  const curL=box(1.2,3.2,0.1,0xf0e0c0); curL.position.set(-1.6,4.5,-7.7);
+  const curR=curL.clone(); curR.position.set(1.6,4.5,-7.7); currentScene.add(curL,curR);
+  const sofa=box(4.4,1,1.8,0x9c5b4d); sofa.position.set(-4,0.6,-5);
+  const sback=box(4.4,1.4,0.4,0x834539); sback.position.set(-4,1.1,-5.7);
+  const cush1=box(1,0.5,0.5,0xd98a3a); cush1.position.set(-5,1.25,-5);
+  const cush2=box(1,0.5,0.5,0x4a7c59); cush2.position.set(-3,1.25,-5);
+  currentScene.add(sofa,sback,cush1,cush2);
+  const table=box(2.2,0.4,1.3,0x7a5a3a); table.position.set(-4,0.5,-3);
+  const book=box(0.5,0.12,0.35,0xc8402f); book.position.set(-4.4,0.76,-3);
+  const cup=cyl(0.12,0.1,0.25,0xffffff,10); cup.position.set(-3.6,0.75,-3); currentScene.add(table,book,cup);
+  const tvStand=box(3.2,0.8,0.9,0x4a3a2a); tvStand.position.set(4,0.4,-6.4);
+  const tv=box(3.4,2.0,0.18,0x111418); tv.position.set(4,2.1,-6.5);
+  const screen=new THREE.Mesh(new THREE.BoxGeometry(3.0,1.6,0.05),new THREE.MeshBasicMaterial({color:0x2b6fb0})); screen.position.set(4,2.1,-6.4);
+  currentScene.add(tvStand,tv,screen);
+  animItems.push({t:0,update(dt){ this.t+=dt; const k=0.5+0.4*Math.sin(this.t*2.3)+0.08*Math.sin(this.t*7); screen.material.color.setRGB(0.1+0.1*k,0.3+0.2*k,0.5+0.4*k); }});
+  const shelf=box(2.4,3,0.5,0x7a5a3a); shelf.position.set(7,1.5,-7); currentScene.add(shelf);
+  const bookCols=[0xc8402f,0x4a7c59,0xc9962e,0x2b5c8a,0x9c5b4d];
+  for(let i=0;i<5;i++){ const b=box(0.4,0.6,0.4,bookCols[i%5]); b.position.set(6.2+i*0.45,1.0,-6.95); currentScene.add(b); }
+  const fridge=box(1.6,3,1.4,0xeef2f4); fridge.position.set(-7,1.5,-6.5);
+  const fridgeH=box(1.3,0.1,0.1,0x888888); fridgeH.position.set(-7,2.2,-5.78);
+  const counter=box(4,1,1.2,0xcfc3ad); counter.position.set(-6.5,0.5,5);
+  const stove=box(1.2,0.2,0.8,0x333333); stove.position.set(-6.5,1.05,5); currentScene.add(fridge,fridgeH,counter,stove);
+  const dtable=box(2.4,0.3,1.4,0x8a5a3a); dtable.position.set(3,0.7,3); currentScene.add(dtable);
+  makeChair(2.2,3.4,0.6); makeChair(3.8,3.4,Math.PI-0.6); makeChair(3,2.6,Math.PI/2); makeChair(3,4.2,-Math.PI/2);
+  makePlant(6.4,5,1.1); makePlant(-7,2,0.8);
+  makePicture(-5,5.2,-7.8,0,0x9cc2d6); makePicture(5,5.2,-7.8,0,0xe0b07a);
+  const cat=new THREE.Group(); const cb=cyl(0.18,0.22,0.5,0x4a4a4a,10); cb.rotation.z=Math.PI/2; cb.position.y=0.3;
+  const chead=sph(0.22,0x4a4a4a); chead.position.set(0.4,0.45,0); const ctail=cyl(0.05,0.05,0.6,0x4a4a4a,6); ctail.position.set(-0.4,0.4,0); ctail.rotation.z=0.8;
+  cat.add(cb,chead,ctail); cat.position.set(1.5,0,1.5); currentScene.add(cat);
+  animItems.push({t:0,update(dt){ this.t+=dt; cat.position.x=1.5+Math.sin(this.t*0.8)*0.6; cat.rotation.y=Math.sin(this.t*0.8)>0?0.3:-0.3; }});
+  regLamp(0,7.4,0,0xffe6a8,16,1.2);
+  moodGroup=currentScene;
+}
+function buildOffice(){
+  setDayEnv(0xbcd3e0,1.1,0.55);
+  const floor=box(22,0.2,22,0x9aa3a8); floor.position.y=-0.1; currentScene.add(floor);
+  const wall=box(22,9,0.3,0xdfe6ea); wall.position.set(0,4.5,-11);
+  const ceil=box(22,0.3,22,0xeef2f4); ceil.position.set(0,9,0); currentScene.add(wall,ceil);
+  regWindow(0,5,-10.8,0,14,5);
+  for(let i=-1;i<=1;i++){
+    const desk=box(3,0.8,1.4,0x6b4f3a); desk.position.set(i*4.5,0.4,-2);
+    const mon=box(1.5,0.95,0.12,0x101418); mon.position.set(i*4.5,1.45,-2.4);
+    const monGlow=new THREE.Mesh(new THREE.BoxGeometry(1.3,0.75,0.02),new THREE.MeshBasicMaterial({color:0x2b6fb0})); monGlow.position.set(i*4.5,1.45,-2.33);
+    const chair=box(1,1,1,0x2b2620); chair.position.set(i*4.5,0.5,-0.6);
+    const part=box(0.1,1.6,1.6,0xcdd6da); part.position.set(i*4.5+1.5,0.8,-2);
+    currentScene.add(desk,mon,monGlow,chair,part);
+  }
+  makePerson(-6.7,1.5,0.4,1,0x2b5c8a); makePerson(6.9,-0.5,-2.4,1,0x4a7c59);
+  for(let i=0;i<8;i++){ const h=4+Math.random()*7; const b=box(2.2,h,2.2,0x8fa6b2); b.position.set(-10+i*3,h/2-0.1,-18); currentScene.add(b); if(i%2===0) regWindow(-10+i*3,h*0.5,-16.9,0,1.4,1.2); }
+  const cooler=box(0.8,1.6,0.8,0xeef6ff); cooler.position.set(8,0.8,-9); currentScene.add(cooler);
+  makePlant(9,8,1);
+  const board=box(3,1.6,0.1,0xffffff); board.position.set(-9,3,-10.8); currentScene.add(board);
+  const coffee=box(0.8,1.2,0.7,0x333333); coffee.position.set(-8,0.6,-9); currentScene.add(coffee);
+  regLamp(-4.5,8.4,0,0xfff0c0,18,1.0); regLamp(4.5,8.4,0,0xfff0c0,18,1.0);
+  moodGroup=currentScene;
+}
+function buildStreet(){
+  setDayEnv(0xd9e6ec,1.15,0.6);
+  const road=box(26,0.2,9,0x55504a); road.position.set(0,-0.1,5);
+  const lane=box(26,0.22,0.3,0xe8d44a); lane.position.set(0,0.02,5);
+  const ground=box(26,0.2,26,0x9bb08a); ground.position.set(0,-0.12,-4); currentScene.add(road,lane,ground);
+  for(let s=-1;s<=1;s+=2){
+    for(let i=-2;i<=2;i++){
+      const h=6+Math.random()*5; const b=box(3.4,h,4.4, s>0?0xd8c0a0:0xc8b49a); b.position.set(s*9.5,h/2-0.1,i*5); currentScene.add(b);
+      for(let w=0;w<2;w++) for(let r=0;r<Math.floor(h/2.4);r++){ if(Math.random()<0.85) regWindow(s*9.5 - s*1.7, 1.6+r*2, i*5 - 2.0, 0, 0.9,1.0); }
+    }
+  }
+  const shop=box(5,4,4,0xe0b07a); shop.position.set(0,2,-6);
+  const awning=box(5.4,0.3,1.6,0xc8402f); awning.position.set(0,4.1,-4.2); awning.rotation.x=-0.3;
+  const sign=box(5,1,0.2,0xc8402f); sign.position.set(0,4.6,-5.8); currentScene.add(shop,awning,sign);
+  regWindow(0,2.6,-5.8,0,3,1.6);
+  for(let i=-1;i<=1;i++){ regLamp(i*9,5.2,5,0xfff2b0,12,1.0); const pole=cyl(0.15,0.15,5,0x333333); pole.position.set(i*9,2.5,5); currentScene.add(pole); }
+  makeTree(-7,4,1); makeTree(7,-2,1.1); makeTree(-7,-6,0.9);
+  const busstop=box(3,2.4,0.2,0x9aa3a8); busstop.position.set(6,1.2,5.5); const bsroof=box(3.4,0.2,1,0x4a7c59); bsroof.position.set(6,2.5,5.8); currentScene.add(busstop,bsroof);
+  const car1=box(2.4,0.9,1.2,0xc8402f); car1.position.set(0,0.55,5); const cw1=cyl(0.3,0.3,0.2,0x222222,12); cw1.rotation.x=Math.PI/2; cw1.position.set(-0.7,0.25,5); const cw2=cw1.clone(); cw2.position.set(0.7,0.25,5); currentScene.add(car1,cw1,cw2);
+  makePerson(-3,2,2.2,0.95,0x9c5b4d); makePerson(3,3,-1.5,0.95,0x2b5c8a);
+  makeCloud(-12,12,-18,1.4); makeCloud(6,14,-22,1.8); makeCloud(16,11,-15,1.2);
+  makeStars();
+  moodGroup=currentScene;
+}
+function buildPark(){
+  setDayEnv(0xa9d8b0,1.2,0.6);
+  const grass=box(28,0.2,28,0x7fae6a); grass.position.y=-0.1; currentScene.add(grass);
+  const path=box(4,0.22,28,0xcbb48a); path.position.set(0,0,-2); currentScene.add(path);
+  for(let i=0;i<8;i++){ const x=(Math.random()*2-1)*11, z=-12+Math.random()*20; makeTree(x,z,0.9+Math.random()*0.5); }
+  const pond=cyl(3.4,3.4,0.2,0x6fb0d8,28); pond.position.set(-6,0.05,-6); currentScene.add(pond);
+  const lily=cyl(0.6,0.6,0.05,0x4a7c59,16); lily.position.set(-6.6,0.12,-5.4); const lily2=lily.clone(); lily2.position.set(-5.4,0.12,-6.4); currentScene.add(lily,lily2);
+  const fountain=cyl(0.8,1.0,0.6,0xcfd6da,16); fountain.position.set(5,0.3,2); const water=cyl(0.7,0.7,0.05,0x9fd0ea,16); water.position.set(5,0.62,2); currentScene.add(fountain,water);
+  animItems.push({t:0,update(dt){ this.t+=dt; water.position.y=0.62+Math.sin(this.t*3)*0.05; water.scale.setScalar(1+Math.sin(this.t*3)*0.05); }});
+  const bench=box(3,0.4,0.8,0x8a5a3a); bench.position.set(4,0.6,-3); const bl1=box(0.3,0.6,0.7,0x6b4a2a); bl1.position.set(3,0.3,-3); const bl2=bl1.clone(); bl2.position.set(5,0.3,-3); currentScene.add(bench,bl1,bl2);
+  regLamp(0,4.5,-8,0xfff2b0,12,0.9); const lp=cyl(0.12,0.12,4.5,0x333333); lp.position.set(0,2.25,-8); currentScene.add(lp);
+  for(let i=0;i<10;i++){ const f=sph(0.25,[0xc8402f,0xc9962e,0xe07ab0][i%3]); f.position.set((Math.random()*2-1)*12,0.25,(Math.random()*2-1)*12); currentScene.add(f); }
+  makeLeaves(); makeCloud(10,13,-20,1.6); makeStars();
+  moodGroup=currentScene;
+}
+
+/* ---- 新场景：夜市 / 商场 ---- */
+function buildNightMarket(){
+  setDayEnv(0x3a2c3a,0.5,0.4);
+  currentScene.userData.alwaysNight=true;
+  const ground=box(30,0.2,18,0x4a4540); ground.position.y=-0.1; currentScene.add(ground);
+  const stallCols=[0xc8402f,0x4a7c59,0xc9962e,0x2b5c8a,0xe07ab0,0x9c5b4d];
+  for(let i=0;i<6;i++){
+    const x=-12+i*4.5; const stall=box(3,1.6,2.4,0x8a5a3a); stall.position.set(x,0.8,-2);
+    const counter=box(3,0.6,0.6,0x6b4a2a); counter.position.set(x,0.5,0.4);
+    const awning=box(3.4,0.2,2.8,stallCols[i%6]); awning.position.set(x,2.2,-1); awning.rotation.x=-0.15;
+    currentScene.add(stall,counter,awning);
+    regLamp(x,2.0,0.6,0xffd27a,9,0.9);
+  }
+  for(let i=0;i<5;i++){ const lx=-10+i*5; regLamp(lx,3.4,-1,0xffe08a,7,0.7); }
+  for(let i=0;i<8;i++){ const lx=-12+i*3.4; const lantern=new THREE.Mesh(new THREE.SphereGeometry(0.4,12,12),new THREE.MeshBasicMaterial({color:0xd83a2a})); lantern.position.set(lx,4.2,-1); const ll=new THREE.PointLight(0xff5a3a,0.5,6); ll.position.set(lx,4.2,-1); currentScene.add(lantern,ll); currentScene.userData.lamps.push({light:ll,bulb:lantern,inten:0.5}); }
+  for(let i=0;i<6;i++){ makePerson((Math.random()*2-1)*10, 1+Math.random()*4, Math.random()*6, 0.92, stallCols[i%6]); }
+  makeCloud(8,14,-20,1.6);
+  moodGroup=currentScene;
+}
+function buildMall(){
+  setDayEnv(0xe9eef2,0.5,0.7);
+  currentScene.userData.alwaysNight=true;
+  if(window._sun) window._sun.intensity=0.2; if(window._amb) window._amb.intensity=0.7; if(window._hemi) window._hemi.intensity=0.6;
+  const floor=box(28,0.2,28,0xd8dde2); floor.position.y=-0.1; currentScene.add(floor);
+  const ceil=box(28,0.3,28,0xf3f6f8); ceil.position.set(0,9,0); currentScene.add(ceil);
+  const fountain=cyl(1.4,1.6,0.8,0xcdd6da,20); fountain.position.set(0,0.4,0); const fw=cyl(1.3,1.3,0.05,0x9fd0ea,20); fw.position.set(0,0.8,0); currentScene.add(fountain,fw);
+  animItems.push({t:0,update(dt){ this.t+=dt; fw.position.y=0.8+Math.sin(this.t*3)*0.06; }});
+  const shopCols=[0xc8402f,0x2b5c8a,0x4a7c59,0xc9962e,0xe07ab0,0x9c5b4d,0x2b2620];
+  for(let i=0;i<7;i++){ const a=i/7*Math.PI*2; const x=Math.cos(a)*10, z=Math.sin(a)*10; const shop=box(3.4,3.2,3.4,shopCols[i%7]); shop.position.set(x,1.6,z); currentScene.add(shop); const sign=box(3.4,0.8,0.1,0xffffff); sign.position.set(x,3.2,z); const sg=box(3.0,0.5,0.05,shopCols[i%7]); sg.position.set(x,3.2,z+0.06); currentScene.add(sign,sg); }
+  const esc=box(2,0.3,5,0xb0b8bf); esc.position.set(0,1,-9); esc.rotation.x=-0.25; currentScene.add(esc);
+  makePlant(-4,4,1.2); makePlant(4,-4,1.0);
+  regLamp(-6,8.5,0,0xffffff,20,1.1); regLamp(6,8.5,0,0xffffff,20,1.1); regLamp(0,8.5,6,0xffffff,20,1.1);
+  for(let i=0;i<5;i++){ makePerson((Math.random()*2-1)*8, (Math.random()*2-1)*8, Math.random()*6, 0.95, shopCols[i%7]); }
+  moodGroup=currentScene;
+}
+
+/* ---- 昼夜切换 ---- */
+function setDayNight(){
+  if(!currentScene) return;
+  const ud=currentScene.userData;
+  const night = isNight || (ud.alwaysNight===true);
+  if(night){
+    if(scene.background) scene.background.set(0x0e1626);
+    if(scene.fog) scene.fog.color.set(0x0e1626);
+    if(window._sun) window._sun.intensity=0.10;
+    if(window._amb) window._amb.intensity=0.28;
+    if(window._hemi) window._hemi.intensity=0.22;
+    ud.lamps.forEach(L=>{ L.light.intensity=L.inten; L.bulb.visible=true; });
+    ud.windows.forEach(m=>{ m.emissiveIntensity=0.9; });
+    if(ud.stars) ud.stars.material.opacity=0.9;
+  } else {
+    if(ud.dayBg) scene.background.copy(ud.dayBg);
+    if(scene.fog&&ud.dayBg) scene.fog.color.copy(ud.dayBg);
+    if(window._sun) window._sun.intensity=ud.daySun!=null?ud.daySun:1.1;
+    if(window._amb) window._amb.intensity=ud.dayAmb!=null?ud.dayAmb:0.55;
+    if(window._hemi) window._hemi.intensity=(ud.dayAmb!=null?ud.dayAmb:0.55)*0.9;
+    const keep = ud.alwaysNight===true;
+    ud.lamps.forEach(L=>{ L.light.intensity= keep?L.inten:0; L.bulb.visible= !!keep; });
+    ud.windows.forEach(m=>{ m.emissiveIntensity=0; });
+    if(ud.stars) ud.stars.material.opacity=0;
+  }
+}
+function setupEnvButton(){
+  const wrap=document.querySelector('.hud-right'); if(!wrap) return;
+  if(document.getElementById('envBtn')) return;
+  const b=document.createElement('button'); b.id='envBtn'; b.title='昼夜切换';
+  b.style.cssText='width:42px;height:42px;border-radius:50%;background:var(--panel);border:1px solid var(--line);font-size:18px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;';
+  b.textContent='🌞';
+  b.onclick=()=>{ isNight=!isNight; b.textContent=isNight?'🌜':'🌞'; setDayNight(); toast(isNight?'夜幕降临':'阳光明媚'); sfx(); };
+  wrap.appendChild(b);
+  // 夜市/商场已在 LOCS 初始数组中声明，避免重复 push 导致页签重复
+}
+
+/* ============================================================
+   走动控制 + 互动点系统
+   ============================================================ */
+const SPOT_DEFS = {
+  home:[
+    {pos:[-4,0,-3], label:'🛋️ 客厅', color:0xd98a3a, actions:['leisure','social'],
+      intro:'回到家的港湾，沙发和电视都在等你。', discover:'你窝进客厅的沙发，熟悉的安心气息扑面而来。',
+      ev:{t:'窝进客厅', x:'你陷进沙发，电视的光映在脸上，一整天的紧绷慢慢松下来。',
+        c:[{l:'看会儿电视',s:'放松一下，快乐+3 精力+2',e:{happy:3,energy:2}},
+           {l:'陪家人聊聊',s:'温暖融洽，人脉+2 快乐+2',e:{network:2,happy:2}},
+           {l:'起身去做事',s:'不虚度时光',e:{}}]}},
+    {pos:[7,0,-7], label:'📚 书架', color:0x2b5c8a, actions:['study','invest'],
+      intro:'一排书脊里，藏着提升自我的可能。', discover:'你驻足书架前，指尖划过一本本读过的和未读的书。',
+      ev:{t:'驻足书架', x:'指尖划过书脊，你想起年初立下的学习计划还落了灰。',
+        c:[{l:'读两页书',s:'静心充电，技能+3',e:{skill:3,happy:1}},
+           {l:'整理书架',s:'清爽整洁，快乐+1',e:{happy:1}},
+           {l:'放下离开',s:'下次一定',e:{}}]}},
+    {pos:[-6.5,0,5], label:'🍳 厨房', color:0x4a7c59, actions:['fit','leisure'],
+      intro:'烟火气里，也能料理出好身体好心情。', discover:'厨房里飘出饭菜香，那是生活最朴实的慰藉。',
+      ev:{t:'下厨时光', x:'你系上围裙，打算给自己做顿像样的饭。',
+        c:[{l:'认真做饭',s:'健康+4 快乐+2',e:{health:4,happy:2}},
+           {l:'点个外卖',s:'省事但破费，健康-1',e:{money:-300,health:-1}},
+           {l:'随便对付',s:'快乐-1',e:{happy:-1}}]}},
+  ],
+  office:[
+    {pos:[0,0,-2], label:'💻 工位', color:0x2b6fb0, actions:['work','ot'],
+      intro:'坐到工位前，开始一天的工作。', discover:'你坐进工位，显示器亮起，一天的努力就此开始。',
+      ev:{t:'坐到工位', x:'显示器亮起，一天的工作在等你。是埋头，还是摸会儿鱼？',
+        c:[{l:'埋头苦干',s:'声望+3 精力-5',e:{rep:3,energy:-5}},
+           {l:'摸鱼一下',s:'快乐+2 精力+1',e:{happy:2,energy:1}},
+           {l:'起身倒水',s:'走动一下',e:{}}]}},
+    {pos:[-8,0,-9], label:'☕ 茶水间', color:0xc9962e, actions:['social','leisure'],
+      intro:'一杯咖啡的间隙，聊聊人脉与八卦。', discover:'茶水间里同事递来一杯咖啡，话题不知不觉打开了。',
+      ev:{t:'茶水间小憩', x:'同事递来一杯咖啡，话匣子一下子打开了。',
+        c:[{l:'热络聊天',s:'人脉+5 快乐+3（花点零钱）',e:{network:5,happy:3,money:-200}},
+           {l:'礼貌寒暄',s:'人脉+1',e:{network:1}},
+           {l:'回工位',s:'保持专注',e:{}}]}},
+    {pos:[8,0,8], label:'📈 窗边远眺', color:0x4a7c59, actions:['study','invest'],
+      intro:'眺望窗外楼群，规划下一步成长。', discover:'你望着窗外林立的高楼，默默盘算着自己的进阶路线。',
+      ev:{t:'窗边远眺', x:'你望着窗外林立的高楼，盘算自己的进阶路线。',
+        c:[{l:'规划职业',s:'技能+2 声望+1',e:{skill:2,rep:1}},
+           {l:'发会儿呆',s:'放松，精力+3',e:{energy:3}},
+           {l:'回过神来',s:'继续工作',e:{}}]}},
+  ],
+  street:[
+    {pos:[0,0,-6], label:'🏪 街角小店', color:0xc8402f, actions:['biz','social'],
+      intro:'巷口小店，藏着小本生意的机会。', discover:'街角小店的招牌在风里轻响，市井的生机就在身边。',
+      ev:{t:'巷口小店', x:'招牌在风里轻响，老板冲你笑了笑。',
+        c:[{l:'聊生意经',s:'人脉+3 灵感+2',e:{network:3,skill:2}},
+           {l:'买点东西',s:'花钱，快乐+1',e:{money:-200,happy:1}},
+           {l:'路过',s:'不耽误',e:{}}]}},
+    {pos:[6,0,5.5], label:'🚏 公交站', color:0x9aa3a8, actions:['work','leisure'],
+      intro:'等一班车，也等一个更好的机会。', discover:'你在公交站候车，城市的节奏在身旁流淌。',
+      ev:{t:'公交站候车', x:'城市的节奏在身旁流淌，你等的人还没来。',
+        c:[{l:'听播客学习',s:'技能+2',e:{skill:2}},
+           {l:'刷手机',s:'快乐+1 精力-1',e:{happy:1,energy:-1}},
+           {l:'看人来人往',s:'放松一下',e:{}}]}},
+    {pos:[-9,0,5], label:'🚶 路人', color:0x4a7c59, actions:['social','fit'],
+      intro:'街头偶遇，或许是一段缘分或提醒。', discover:'街角一位路人向你点头，平凡日子里也有温度。',
+      ev:{t:'街头偶遇', x:'一位路人向你点头，平凡日子也有温度。',
+        c:[{l:'热心搭话',s:'人脉+2 快乐+2',e:{network:2,happy:2}},
+           {l:'点头致意',s:'礼貌',e:{}},
+           {l:'低头赶路',s:'专注自己',e:{}}]}},
+  ],
+  park:[
+    {pos:[5,0,2], label:'⛲ 喷泉广场', color:0x6fb0d8, actions:['leisure','social'],
+      intro:'水花轻溅，慢下来才看得见风景。', discover:'你坐在喷泉边，看水珠在阳光下散成彩虹。',
+      ev:{t:'喷泉边小坐', x:'水珠在阳光下散成彩虹，你忍不住坐下。',
+        c:[{l:'发呆放空',s:'快乐+4 精力+4',e:{happy:4,energy:4}},
+           {l:'遛弯锻炼',s:'健康+3',e:{health:3}},
+           {l:'起身离开',s:'继续逛',e:{}}]}},
+    {pos:[-6,0,-6], label:'🌿 池塘边', color:0x4a7c59, actions:['fit','study'],
+      intro:'绿意环绕，最适合舒展身心。', discover:'池塘边清风拂面，你深吸一口，脚步轻快起来。',
+      ev:{t:'池塘边', x:'清风拂面，你深吸一口，脚步轻快起来。',
+        c:[{l:'练会儿太极',s:'健康+4 精力+2',e:{health:4,energy:2}},
+           {l:'喂喂鱼',s:'惬意，快乐+2',e:{happy:2}},
+           {l:'坐下休息',s:'放松',e:{}}]}},
+    {pos:[4,0,-3], label:'🪑 长椅', color:0xc9962e, actions:['leisure','social'],
+      intro:'歇一歇，看看往来的人群。', discover:'你躺在长椅上晒太阳，难得的松弛感。',
+      ev:{t:'躺在长椅上', x:'难得的松弛感，你干脆躺了下来。',
+        c:[{l:'晒会儿太阳',s:'快乐+3 健康+1',e:{happy:3,health:1}},
+           {l:'闭目养神',s:'精力+4',e:{energy:4}},
+           {l:'起身走走',s:'活动一下',e:{}}]}},
+  ],
+  nightmarket:[
+    {pos:[-6,0,-1], label:'🍢 小吃摊', color:0xc8402f, actions:['social','leisure'],
+      intro:'烟火气最浓处，治愈一整天的疲惫。', discover:'夜市小吃摊热气腾腾，香味勾起了馋虫。',
+      ev:{t:'小吃摊前', x:'热气腾腾，香味勾起了馋虫。',
+        c:[{l:'大快朵颐',s:'快乐+4 健康+1（花点钱）',e:{happy:4,health:1,money:-200}},
+           {l:'浅尝辄止',s:'快乐+1',e:{happy:1}},
+           {l:'看看就好',s:'管住嘴',e:{}}]}},
+    {pos:[3,0,-1], label:'🏮 红灯笼下', color:0xe07ab0, actions:['biz','social'],
+      intro:'夜市深处，藏着练摊致富的门道。', discover:'红灯笼下人声鼎沸，你也动了做点小买卖的念头。',
+      ev:{t:'红灯笼下', x:'人声鼎沸，你动了练摊的念头。',
+        c:[{l:'请教摊主',s:'技能+3 人脉+2',e:{skill:3,network:2}},
+           {l:'摆个小摊',s:'试试水，金钱+800 精力-5',e:{money:800,energy:-5}},
+           {l:'只逛不买',s:'纯逛',e:{}}]}},
+    {pos:[9,0,3], label:'🎲 游戏摊', color:0x9c5b4d, actions:['biz','leisure'],
+      intro:'小赌怡情，也考验手气与心态。', discover:'游戏摊前围满了人，欢呼声此起彼伏。',
+      ev:{t:'游戏摊前', x:'欢呼声此起彼伏，你也被勾起了兴致。',
+        c:[{l:'玩两把',s:'快乐+3 但可能破财',e:{happy:3,money:-300}},
+           {l:'看别人玩',s:'快乐+1',e:{happy:1}},
+           {l:'不感兴趣',s:'离开',e:{}}]}},
+  ],
+  mall:[
+    {pos:[0,0,4], label:'⛲ 中庭', color:0x6fb0d8, actions:['leisure','social'],
+      intro:'商场中庭，是休憩也是偶遇的圆心。', discover:'中庭喷泉旁，你遇见了许久未见的熟人。',
+      ev:{t:'商场中庭', x:'喷泉旁，你遇见了许久未见的熟人。',
+        c:[{l:'叙旧寒暄',s:'人脉+4 快乐+3',e:{network:4,happy:3}},
+           {l:'点头示意',s:'礼貌，人脉+1',e:{network:1}},
+           {l:'继续逛',s:'自由',e:{}}]}},
+    {pos:[8,0,0], label:'🛍️ 品牌店', color:0xc8402f, actions:['invest','leisure'],
+      intro:'橱窗里的精致，总要花点代价。', discover:'品牌店灯光璀璨，你心动下单，钱包轻了一些。',
+      ev:{t:'品牌店橱窗', x:'灯光璀璨，你心动了。',
+        c:[{l:'果断下单',s:'快乐+3 破财',e:{happy:3,money:-1500}},
+           {l:'试了再走',s:'快乐+1',e:{happy:1}},
+           {l:'理性离开',s:'守住钱包',e:{}}]}},
+    {pos:[-8,0,-4], label:'☕ 美食区', color:0x4a7c59, actions:['social','fit'],
+      intro:'一杯饮品的时间，聊聊近况。', discover:'美食区落座，朋友分享了几条实用情报。',
+      ev:{t:'美食区落座', x:'朋友分享了几条实用情报。',
+        c:[{l:'请客交流',s:'人脉+5 花钱',e:{network:5,money:-400}},
+           {l:'听情报',s:'人脉+2 技能+1',e:{network:2,skill:1}},
+           {l:'独享安静',s:'放松',e:{}}]}},
+  ],
+};
+
+function setupSpots(loc){
+  const defs = SPOT_DEFS[loc]||[];
+  currentScene.userData.spots=[];
+  defs.forEach(d=>{
+    const g=new THREE.Group();
+    const col=new THREE.Color(d.color);
+    const pillar=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,2.2,12), new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.28}));
+    pillar.position.y=1.1;
+    const top=new THREE.Mesh(new THREE.OctahedronGeometry(0.42), new THREE.MeshBasicMaterial({color:col}));
+    top.position.y=2.7;
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(1.0,0.05,8,40), new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.85}));
+    ring.rotation.x=Math.PI/2; ring.position.y=0.06;
+    const beam=new THREE.Mesh(new THREE.CylinderGeometry(0.85,0.85,4.2,20,1,true),
+      new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.1,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false}));
+    beam.position.y=2.1;
+    const label=new THREE.Mesh(new THREE.PlaneGeometry(1.7,0.42),
+      new THREE.MeshBasicMaterial({map:makeLabelTexture(d.label),transparent:true,side:THREE.DoubleSide,depthWrite:false}));
+    label.position.y=3.25;
+    g.add(pillar,top,ring,beam,label); g.position.set(d.pos[0],0,d.pos[2]); g.userData={near:false,top,ring,beam};
+    currentScene.add(g);
+    currentScene.userData.spots.push({mesh:g,pos:{x:d.pos[0],z:d.pos[2]},label:d.label,actions:d.actions,intro:d.intro,discover:d.discover,ev:d.ev,used:false,seen:false});
+    holoLabels.push(label);
+    animItems.push({t:0,update(dt,tt){ this.t+=dt; top.rotation.y+=dt*1.6; ring.rotation.z+=dt*0.8; g.position.y=Math.sin(this.t*2)*0.1; beam.material.opacity=0.08+Math.sin(tt*2)*0.04; }});
+  });
+}
+
+function updateMovement(dt){
+  if(!avatar||!state||state.ended) return;
+  let ix=0, iy=0;
+  if(keys['w']||keys['arrowup']) iy+=1;
+  if(keys['s']||keys['arrowdown']) iy-=1;
+  if(keys['a']||keys['arrowleft']) ix-=1;
+  if(keys['d']||keys['arrowright']) ix+=1;
+  ix+=joy.x; iy-=joy.y;
+  const len=Math.hypot(ix,iy); if(len>1){ ix/=len; iy/=len; }
+  if(len<0.06){ avatar.userData.moving=false; return; }
+  avatar.userData.moving=true; idleT=0;
+  const fwdX=-Math.sin(camTheta), fwdZ=-Math.cos(camTheta);
+  const rightX=Math.cos(camTheta), rightZ=-Math.sin(camTheta);
+  const mx=fwdX*iy+rightX*ix, mz=fwdZ*iy+rightZ*ix;
+  const sp=6*dt;
+  const B=BOUNDS[state.location]||{x:11,z:11};
+  avatar.position.x=clamp(avatar.position.x+mx*sp,-B.x,B.x);
+  avatar.position.z=clamp(avatar.position.z+mz*sp,-B.z,B.z);
+  avatar.rotation.y=Math.atan2(mx,mz);
+  // 走动仅用于探索场景，不再随机打断；随机事件统一在每年决策后出现
+}
+
+// 检测附近互动点：仅更新提示条与“发现”日记，绝不改写控制面板的行动列表
+function checkProximity(){
+  if(!avatar||!currentScene||!currentScene.userData.spots) return;
+  let best=null, bd=3.2;
+  for(const s of currentScene.userData.spots){
+    const d=Math.hypot(avatar.position.x-s.pos.x, avatar.position.z-s.pos.z);
+    const near = d<bd;
+    s.mesh.userData.near = near;
+    s.mesh.scale.setScalar(near?1.3:1);
+    if(near){ best=s; bd=d; }
+  }
+  nearbySpot=best;
+  const hint=$('#interactHint');
+  if(best && state && !state.ended){ hint.classList.remove('hidden'); $('#ihName').textContent=best.label;
+    if(!best.seen){ best.seen=true; pushLog(best.discover); } stageLabel(); }
+  else hint.classList.add('hidden');
+}
+
+// 互动：触发该地点的专属事件（全息卡），丰富探索体验；点击即互动，不锁死、不推进年份
+function interact(){
+  if(!state || state.ended) return;
+  if(!nearbySpot){ toast('走到发光的互动点附近，再按「互动」✦'); return; }
+  const sp=nearbySpot;
+  const ev = sp.ev || {
+    t:`在【${sp.label}】`, x:sp.intro,
+    c:[{l:'驻足停留',s:'放松一下，快乐+2 精力+3',e:{happy:2,energy:3}},
+       {l:'继续赶路',s:'不耽误正事',e:{}}]
+  };
+  openEvent(ev, ()=>{}); // 地点事件为即时探索，不推进年份
+  sfx();
+}
+
+function setupControls(){
+  if(window.__ctrlBound) return; window.__ctrlBound=true;
+  const kset=['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'];
+  addEventListener('keydown',e=>{ const k=e.key.toLowerCase(); keys[k]=true; if(k==='e'&&state&&!state.ended) interact(); if(kset.includes(k)) e.preventDefault(); });
+  addEventListener('keyup',e=>{ keys[e.key.toLowerCase()]=false; });
+  const j=$('#joystick'), t=$('#joyThumb'); if(!j||!t) return;
+  let active=false, cx=0, cy=0; const Rr=46;
+  const setJoy=(e)=>{ let dx=e.clientX-cx, dy=e.clientY-cy; const d=Math.hypot(dx,dy); if(d>Rr){ dx*=Rr/d; dy*=Rr/d; }
+    joy.x=dx/Rr; joy.y=dy/Rr; t.style.left=(50+dx/Rr*50)+'%'; t.style.top=(50+dy/Rr*50)+'%'; };
+  j.addEventListener('pointerdown',e=>{ active=true; const r=j.getBoundingClientRect(); cx=r.left+r.width/2; cy=r.top+r.height/2; j.setPointerCapture(e.pointerId); setJoy(e); e.preventDefault(); });
+  j.addEventListener('pointermove',e=>{ if(active) setJoy(e); });
+  const reset=()=>{ active=false; joy.x=0; joy.y=0; t.style.left='50%'; t.style.top='50%'; };
+  j.addEventListener('pointerup',reset); j.addEventListener('pointercancel',reset);
+  const ih=$('#ihBtn'); if(ih) ih.onclick=()=>interact();
+  const sc=$('#spotClose'); if(sc) sc.onclick=()=>$('#spotModal').classList.add('hidden');
+}
+
+</script>
+</body>
+</html>
