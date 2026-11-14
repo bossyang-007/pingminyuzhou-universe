@@ -70,7 +70,8 @@ npm run god -- "一座海边灯塔小镇，宁静治愈"
 1. 读 [CONTRIBUTING.md](./CONTRIBUTING.md) 了解内容驱动的开发方式；
 2. 想加场景 / 身份 / 事件？**只改 `src/content/` 下的数据**，无需碰引擎；
 3. 想改引擎 / 系统 / UI？在对应 `src/engine`、`src/systems`、`src/ui` 下提交；
-4. 分支开发 → PR → 评审合并。
+4. 分支开发 → PR → 评审合并；合并后你的场景会自动出现在 [SCENES.md](./SCENES.md) 共创荣誉墙。
+5. 想用 AI 概念图贴到场景？给道具加 `texture`、给地台加 `groundTex`（见 [schema.md](./src/content/schema.md)），文件缺失自动降级纯色。
 
 ---
 

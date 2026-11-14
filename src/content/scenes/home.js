@@ -5,6 +5,7 @@ import { SCENE_REGISTRY } from './registry.js';
 SCENE_REGISTRY.push({
   id: 'home',
   name: '温馨小家',
+  meta: { author: '平民宇宙核心团队', style: '居家治愈', note: '六大基础场景之一，普通人的小窝' },
   sky: '#c9b79a',
   ground: '#b98c5a',
   fog: 0.01,

@@ -4,6 +4,7 @@ import { SCENE_REGISTRY } from './registry.js';
 SCENE_REGISTRY.push({
   id: 'park',
   name: '公园',
+  meta: { author: '平民宇宙核心团队', style: '自然治愈', note: '六大基础场景之一，松弛感的来源' },
   sky: '#aed3e8',
   ground: '#7fae6a',
   fog: 0.012,

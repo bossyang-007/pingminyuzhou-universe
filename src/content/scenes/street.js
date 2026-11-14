@@ -4,6 +4,7 @@ import { SCENE_REGISTRY } from './registry.js';
 SCENE_REGISTRY.push({
   id: 'street',
   name: '街角',
+  meta: { author: '平民宇宙核心团队', style: '市井烟火', note: '六大基础场景之一，城市毛细血管' },
   sky: '#aebfc9',
   ground: '#6f7a82',
   fog: 0.016,

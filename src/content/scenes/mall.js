@@ -4,6 +4,7 @@ import { SCENE_REGISTRY } from './registry.js';
 SCENE_REGISTRY.push({
   id: 'mall',
   name: '商场',
+  meta: { author: '平民宇宙核心团队', style: '都市商业', note: '六大基础场景之一，消费与相遇的场所' },
   sky: '#cdd6dd',
   ground: '#cfd6dc',
   fog: 0.012,

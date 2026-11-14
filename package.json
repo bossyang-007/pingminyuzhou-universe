@@ -7,6 +7,7 @@
     "dev": "node tools/serve.mjs",
     "god": "node tools/creator-god/generate.mjs",
     "sync": "node tools/sync-scenes.mjs",
+    "scenes": "node tools/gen-scenes-md.mjs",
     "build": "node tools/build.mjs",
     "validate": "node tools/sync-scenes.mjs && node tools/creator-god/generate.mjs --check && node tools/build.mjs"
   },

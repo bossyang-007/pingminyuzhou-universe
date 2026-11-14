@@ -13,11 +13,12 @@
   fog: 0.01,                  // 雾浓度（0 = 无，越大越朦胧）
   spawn: [0, 0, 4],           // 玩家出生点 [x, y, z]
   props: [ /* 见下 */ ],      // 静态道具
-  spots: [ /* 见下 */ ],
+  spots: [ /* 见下 */ ],        // 可互动发光点
+  groundTex: 'assets/scenes/<id>/floor.png', // 可选：地面贴图，缺失时降级为纯色 ground
   meta: {                      // 可选：作者/风格/素材溯源
     author: '昵称', style: '赛博/古风/治愈…',
     art: 'assets/scenes/<id>/concept.png', note: '灵感来源'
-  }      // 可互动发光点
+  }
 }
 ```
 
@@ -31,6 +32,7 @@
 | `color` | ✅ | 十六进制颜色 |
 | `emissive` | ❌ | 自发光色（做灯/霓虹），如 `'#ffb347'` |
 | `rotY` | ❌ | 绕 Y 轴旋转（弧度） |
+| `texture` | ❌ | 道具表面贴图路径，如 `'assets/scenes/<id>/sofa.png'`；缺失时降级为纯色 `color` |
 
 ### 互动点 Spot（`spots[]`）
 

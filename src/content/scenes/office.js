@@ -4,6 +4,7 @@ import { SCENE_REGISTRY } from './registry.js';
 SCENE_REGISTRY.push({
   id: 'office',
   name: '写字楼',
+  meta: { author: '平民宇宙核心团队', style: '都市办公', note: '六大基础场景之一，打工人的日常' },
   sky: '#9fb3c4',
   ground: '#8c98a3',
   fog: 0.014,

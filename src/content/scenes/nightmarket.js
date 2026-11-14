@@ -4,6 +4,7 @@ import { SCENE_REGISTRY } from './registry.js';
 SCENE_REGISTRY.push({
   id: 'nightmarket',
   name: '夜市',
+  meta: { author: '平民宇宙核心团队', style: '夜晚集市', note: '六大基础场景之一，烟火气最浓的地方' },
   sky: '#2a2233',
   ground: '#3a2f3f',
   fog: 0.02,

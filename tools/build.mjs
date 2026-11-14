@@ -89,6 +89,9 @@ async function main() {
   const out = join(ROOT, 'dist', 'pingmin-yuzhou.html');
   await writeFile(out, html, 'utf8');
   console.log('  ✓ 已生成单文件:', out);
+
+  // 发版同时刷新「场景共创荣誉墙」SCENES.md
+  await import('file://' + join(ROOT, 'tools', 'gen-scenes-md.mjs'));
 }
 
 main().catch((e) => { console.error('  ✗ 打包失败:', e.message); process.exit(1); });

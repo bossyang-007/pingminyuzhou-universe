@@ -16,10 +16,30 @@ function makeMesh(p) {
     mat.emissive = new THREE.Color(p.emissive);
     mat.emissiveIntensity = 0.9;
   }
+  // 可选贴图：成员可用 AI/ComfyUI 生成的概念图贴到该道具表面（文件缺失时静默降级为纯色）
+  if (p.texture) applyTexture(mat, p.texture);
   const m = new THREE.Mesh(geo, mat);
   m.position.set(p.pos[0], p.pos[1], p.pos[2]);
   if (p.rotY) m.rotation.y = p.rotY;
   return m;
+}
+
+// 异步加载贴图并贴到材质（缺失/失败则保持纯色，不影响渲染）
+function applyTexture(mat, url) {
+  try {
+    const loader = new THREE.TextureLoader();
+    if (loader.setCrossOrigin) loader.setCrossOrigin('anonymous');
+    loader.load(
+      url,
+      (tex) => {
+        if ('sRGBEncoding' in THREE) tex.encoding = THREE.sRGBEncoding;
+        mat.map = tex;
+        mat.needsUpdate = true;
+      },
+      undefined,
+      () => { /* 加载失败：保持纯色，静默降级 */ }
+    );
+  } catch (e) { /* 引擎/网络异常时不阻断场景构建 */ }
 }
 
 // 构建一个发光互动点（自发光球 + 地面光环）
@@ -47,9 +67,12 @@ function makeSpot(spot) {
 export function buildScene(cfg, world) {
   const group = new THREE.Group();
 
+  const groundMat = new THREE.MeshLambertMaterial({ color: new THREE.Color(cfg.ground || '#888888') });
+  // 可选地面贴图（成员可提交地台纹理，缺失时降级为纯色）
+  if (cfg.groundTex) applyTexture(groundMat, cfg.groundTex);
   const ground = new THREE.Mesh(
     new THREE.PlaneGeometry(60, 60),
-    new THREE.MeshLambertMaterial({ color: new THREE.Color(cfg.ground || '#888888') })
+    groundMat
   );
   ground.rotation.x = -Math.PI / 2;
   group.add(ground);

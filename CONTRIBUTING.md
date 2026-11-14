@@ -46,6 +46,9 @@ SCENE_REGISTRY.push({
 });
 ```
 
+- 想加 AI 概念图贴图？给某个 `prop` 加 `texture: 'assets/scenes/my_lighthouse/sofa.png'`，或给场景加 `groundTex`（见 `schema.md`）；文件缺失会自动降级为纯色。
+- 想留名？在对象里加 `meta: { author: '你的昵称', style: '...', note: '...' }`，合并后会自动出现在 `SCENES.md` 共创荣誉墙（`npm run scenes` 或发版时生成）。
+
 然后运行聚合脚本，把新场景纳入游戏：
 
 ```bash
