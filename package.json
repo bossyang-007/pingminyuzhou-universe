@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "node tools/serve.mjs",
     "god": "node tools/creator-god/generate.mjs",
+    "hz:init": "node tools/hangzhou/evolve.mjs --init",
+    "hz:evolve": "node tools/hangzhou/evolve.mjs",
     "sync": "node tools/sync-scenes.mjs",
     "scenes": "node tools/gen-scenes-md.mjs",
     "build": "node tools/build.mjs",

@@ -12,10 +12,13 @@ const ROOT = join(__dirname, '..');
 const DIR = join(ROOT, 'src', 'content', 'scenes');
 const INDEX = join(DIR, 'index.js');
 const EXCLUDE = new Set(['registry.js', 'index.js']);
+// 过滤规则：跳过注册表/聚合出口，以及任何「状态/动态数据」文件（如 hangzhou.state.js），
+// 它们由演化工具读写、不是场景，不应被当作场景分包导入。
+const isExcluded = (f) => EXCLUDE.has(f) || /\.state\.js$/.test(f);
 
 export async function syncScenes() {
   const all = (await readdir(DIR))
-    .filter((f) => f.endsWith('.js') && !EXCLUDE.has(f))
+    .filter((f) => f.endsWith('.js') && !isExcluded(f))
     .sort();
   const imports = all.map((f) => `import './${f}';`).join('\n');
   const banner =
