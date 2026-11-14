@@ -10,18 +10,22 @@ npm run dev      # 启动 http://localhost:5173
 
 ## 1. 我想加一张新地图（最常见）
 
-打开 `src/content/scenes.js`，在数组里追加一个场景对象：
+在 `src/content/scenes/` 目录下新建一个文件，例如 `my_lighthouse.js`：
 
 ```js
-{
-  id: 'lighthouse',
+// src/content/scenes/my_lighthouse.js
+// 纯数据模块：只描述场景，引擎据此生成 3D 与玩法。字段见 schema.md
+import { SCENE_REGISTRY } from './registry.js';
+
+SCENE_REGISTRY.push({
+  id: 'my_lighthouse',
   name: '海边灯塔',
   sky: '#9ec9e0',
   ground: '#d9c7a3',
   fog: 0.012,
   spawn: [0, 0, 6],
   props: [
-    { type: 'cyl', pos: [0, 4, -8], size: [1.2, 8], color: '#e8e2d0', rotY: 0 },
+    { type: 'cyl', pos: [0, 4, -8], size: [1.2, 8], color: '#e8e2d0' },
     { type: 'cone', pos: [0, 9, -8], size: [1.6, 2], color: '#d8553a' },
     { type: 'box', pos: [4, 0.4, 2], size: [3, 0.8, 2], color: '#7a9aa8' },
   ],
@@ -39,10 +43,16 @@ npm run dev      # 启动 http://localhost:5173
       },
     },
   ],
-}
+});
 ```
 
-保存刷新即可看到新场景出现在场景切换菜单。**无需改任何引擎代码。**
+然后运行聚合脚本，把新场景纳入游戏：
+
+```bash
+npm run sync     # 扫描 scenes/ 目录，自动重建 index.js（聚合出口）
+```
+
+刷新即可在场景切换菜单看到新场景。**无需改任何引擎代码，也无需手改聚合器**——每个成员只写自己的文件，互不冲突。
 
 ### 或者直接召唤创始神
 
@@ -50,7 +60,7 @@ npm run dev      # 启动 http://localhost:5173
 npm run god -- "一座海边灯塔小镇，宁静治愈"
 ```
 
-AI 会按上面的 schema 生成场景并自动插入 `scenes.js`。
+AI 会按 schema 生成场景分包文件并自动 `sync` 到 `index.js`。
 
 ## 2. 道具（props）类型速查
 

@@ -17,8 +17,9 @@ node tools/creator-god/generate.mjs --check
 ## 它做了什么
 
 1. 把自然语言 prompt 解析成 `scene` 配置对象（天空/地面色、道具、互动点、事件）；
-2. 插入 `src/content/scenes.js` 数组末尾；
-3. 下次刷新即被场景管理器读入并渲染。
+2. 写入 `src/content/scenes/<场景id>.js` 分包文件，并按 registry 模式注册；
+3. 自动调用 `npm run sync` 聚合到 `index.js`；
+4. 下次刷新即被场景管理器读入并渲染。
 
 ## 接入大模型（可选）
 

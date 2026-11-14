@@ -55,7 +55,7 @@ npm run god -- "一座海边灯塔小镇，宁静治愈"
 
 ## 🤖 创始神（AI 内容生成）
 
-`tools/creator-god/` 是一个 AI agent 工具：给定一句自然语言描述，按 `scene` schema 生成一张新场景配置并插入 `src/content/scenes.js`，游戏下次刷新即出现。
+`tools/creator-god/` 是一个 AI agent 工具：给定一句自然语言描述，按 `scene` schema 生成一张新场景配置，写入 `src/content/scenes/<场景id>.js` 分包文件并自动聚合到 `index.js`，游戏下次刷新即出现。
 
 - 默认用**模板 + 关键词**离线生成，开箱即用；
 - 若设置 `OPENAI_API_KEY`（或兼容端点）则调用大模型生成更丰富的地图；
@@ -83,7 +83,10 @@ pingmin-yuzhou/
 ├─ src/
 │  ├─ config.js            全局参数与主题
 │  ├─ content/             ④ 内容数据层（纯配置）
-│  │   ├─ scenes.js  identities.js  actions.js  ads.js  index.js
+│  │   ├─ scenes/          场景分包目录（每人一个 <id>.js，registry.js 注册，index.js 自动聚合）
+│  │   │   ├─ registry.js  home.js  office.js  street.js  park.js  nightmarket.js  mall.js
+│  │   │   └─ index.js      聚合出口（npm run sync 自动生成）
+│  │   ├─ identities.js  actions.js  ads.js
 │  │   └─ schema.md        配置规范
 │  ├─ engine/              ③ 引擎层
 │  │   ├─ world.js  sceneManager.js  avatar.js  input.js  holo.js  camera.js

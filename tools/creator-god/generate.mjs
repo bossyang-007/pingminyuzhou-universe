@@ -1,17 +1,20 @@
 // 创始神 · AI 内容生成工具
 // 用法：
-//   node tools/creator-god/generate.mjs "海边灯塔小镇，宁静治愈"   → 生成场景并插入 src/content/scenes.js
-//   node tools/creator-god/generate.mjs --check                  → 校验现有 scenes.js 是否符合 schema
+//   node tools/creator-god/generate.mjs "海边灯塔小镇，宁静治愈"   → 生成场景分包并聚合到 src/content/scenes/
+//   node tools/creator-god/generate.mjs --check                  → 校验现有场景是否符合 schema
 //
 // 默认用「模板 + 关键词」离线生成，开箱即用；
 // 若设置环境变量 LLM_ENDPOINT / LLM_API_KEY，则调用大模型生成更丰富的地图描述（失败自动回退模板）。
+// 生成的场景写入 src/content/scenes/<id>.js，并自动调用 sync-scenes 聚合到 index.js（零冲突）。
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { syncScenes } from '../sync-scenes.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
-const SCENES_PATH = join(ROOT, 'src', 'content', 'scenes.js');
+const SCENES_DIR = join(ROOT, 'src', 'content', 'scenes');
+const SCENES_INDEX = join(SCENES_DIR, 'index.js');
 
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9一-龥]+/g, '_').replace(/^_|_$/g, '').slice(0, 24) || 'map';
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -135,17 +138,20 @@ function toSource(obj) {
   return json.split('\n').map((l) => '  ' + l).join('\n');
 }
 
-async function insertScene(scene) {
-  const content = await readFile(SCENES_PATH, 'utf8');
-  const idx = content.lastIndexOf('];');
-  if (idx < 0) throw new Error('未在 scenes.js 找到数组结尾');
-  const block = ',\n\n' + toSource(scene) + '\n';
-  const next = content.slice(0, idx) + block + content.slice(idx);
-  await writeFile(SCENES_PATH, next, 'utf8');
+// 写场景分包文件，并重新聚合 index.js（避免手改聚合器导致冲突）
+async function writeSceneFile(scene) {
+  const fname = scene.id + '.js';
+  const content =
+    `// 场景分包 · ${scene.name}（由创始神自动生成，纯数据）\n` +
+    '// 字段见 src/content/schema.md\n' +
+    "import { SCENE_REGISTRY } from './registry.js';\n\n" +
+    `SCENE_REGISTRY.push(${toSource(scene)});\n`;
+  await writeFile(join(SCENES_DIR, fname), content, 'utf8');
+  await syncScenes(); // 重新聚合 index.js
 }
 
 async function checkScenes() {
-  const mod = await import('file://' + SCENES_PATH);
+  const mod = await import('file://' + SCENES_INDEX);
   const list = mod.scenes || [];
   let ok = true;
   list.forEach((s, i) => {
@@ -169,10 +175,11 @@ async function main() {
   console.log(`  ✷ 创始神正在孕育「${prompt}」...`);
   let scene = buildSceneData(prompt);
   scene = await llmEnrich(prompt, scene);
-  await insertScene(scene);
-  console.log(`  ✓ 已生成场景并插入 src/content/scenes.js`);
+  await writeSceneFile(scene);
+  console.log(`  ✓ 已生成场景分包 src/content/scenes/${scene.id}.js 并聚合到 index.js`);
   console.log(`    id=${scene.id}  name=${scene.name}  props=${scene.props.length}  spots=${scene.spots.length}`);
   console.log('    刷新游戏即可在新场景切换菜单中看到它。');
+  await checkScenes(); // 生成后顺带校验
 }
 
 main().catch((e) => { console.error('  ✗ 生成失败:', e.message); process.exit(1); });

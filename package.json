@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "node tools/serve.mjs",
     "god": "node tools/creator-god/generate.mjs",
-    "build": "node tools/build.mjs"
+    "sync": "node tools/sync-scenes.mjs",
+    "build": "node tools/build.mjs",
+    "validate": "node tools/sync-scenes.mjs && node tools/creator-god/generate.mjs --check && node tools/build.mjs"
   },
   "license": "MIT",
   "repository": ""
