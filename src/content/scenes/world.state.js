@@ -19,25 +19,42 @@ export const WORLD_STATE = {
   },
   "simYear": 2026,
   "realYear": 2026,
-  "lastSync": "2026-11-15T09:06:18.990Z",
-  "tick": 8,
-  "rngState": 4159510678,
+  "lastSync": "2026-11-15T15:07:57.372Z",
+  "tick": 9,
+  "rngState": 368496658,
   "calendar": {
-    "day": 16,
+    "day": 18,
     "year": 2026,
     "season": "冬",
     "dayType": "工作日"
   },
   "ledger": {
-    "currency": 77.1,
-    "energy": 59.6,
-    "mood": 71.2,
+    "currency": 86.8,
+    "energy": 59.2,
+    "mood": 72.8,
     "link": 100,
-    "satisfaction": 77.3,
+    "satisfaction": 88.1,
     "explore": 70.6,
-    "conflict": 2
+    "conflict": 0
   },
   "activeEvents": [
+    {
+      "id": "E8-80",
+      "type": "mediation",
+      "name": "邻里矛盾调解",
+      "kind": "social",
+      "color": "#9be0b0",
+      "severity": 2,
+      "age": 0,
+      "dur": 3,
+      "eff": {
+        "conflict": -10,
+        "satisfaction": 6,
+        "mood": 4
+      },
+      "bornTick": 8,
+      "bornAt": "2026-D18"
+    },
     {
       "id": "E6-60",
       "type": "boom",
@@ -45,8 +62,8 @@ export const WORLD_STATE = {
       "kind": "economy",
       "color": "#9be86b",
       "severity": 2,
-      "age": 1,
-      "dur": 2,
+      "age": 2,
+      "dur": 1,
       "eff": {
         "currency": 16,
         "mood": 6
@@ -61,33 +78,23 @@ export const WORLD_STATE = {
       "kind": "peace",
       "color": "#8be0ff",
       "severity": 1,
-      "age": 2,
-      "dur": 3,
+      "age": 3,
+      "dur": 2,
       "eff": {
         "conflict": -14,
         "satisfaction": 6
       },
       "bornTick": 5,
       "bornAt": "2026-D12"
-    },
-    {
-      "id": "E4-40",
-      "type": "mutual",
-      "name": "邻里互助公约",
-      "kind": "social",
-      "color": "#7be0a0",
-      "severity": 3,
-      "age": 3,
-      "dur": 1,
-      "eff": {
-        "satisfaction": 10,
-        "link": 8
-      },
-      "bornTick": 4,
-      "bornAt": "2026-D10"
     }
   ],
   "history": [
+    {
+      "tick": 8,
+      "name": "邻里互助公约",
+      "kind": "social",
+      "outcome": "自然落幕"
+    },
     {
       "tick": 5,
       "name": "数字嘉年华",
@@ -108,6 +115,22 @@ export const WORLD_STATE = {
     }
   ],
   "interactions": [
+    {
+      "clock": "2026-D18 (冬/工作日)",
+      "from": "世界中枢",
+      "to": "市井",
+      "kind": "调控",
+      "detail": "平滑物价与小微信贷，托底民生镜像",
+      "effect": "货币流通趋稳"
+    },
+    {
+      "clock": "2026-D18 (冬/工作日)",
+      "from": "邻里自治",
+      "to": "社区",
+      "kind": "共治",
+      "detail": "互助公约与迁徙安置由社区镜像协同",
+      "effect": "满意度与联通回升"
+    },
     {
       "clock": "2026-D16 (冬/工作日)",
       "from": "世界中枢",
@@ -193,6 +216,21 @@ export const WORLD_STATE = {
     {
       "year": 2026,
       "kind": "event",
+      "text": "【涌现】邻里矛盾调解：两户邻里的停车与噪音积怨，经社区镜像调解员促成对话，冲突回落、理解回升（严重度 2）。"
+    },
+    {
+      "year": 2026,
+      "kind": "life",
+      "text": "潮汐空调为全城省下一次峰值负荷，绿电跨区互济生效。"
+    },
+    {
+      "year": 2026,
+      "kind": "end",
+      "text": "【落幕】邻里互助公约（社区镜像发起互助公约，老人就医、孩童托管由邻里接力，满意与联通同步回升（严重度 3）。）已结束。"
+    },
+    {
+      "year": 2026,
+      "kind": "event",
       "text": "【涌现】经济繁荣波：平民创业与小微制造回暖，货币流通加速，市井烟火更旺（严重度 2）。"
     },
     {
@@ -258,6 +296,29 @@ export const WORLD_STATE = {
   ],
   "quests": [
     {
+      "id": "Q_E8-80",
+      "title": "参与·邻里矛盾调解",
+      "desc": "邻里矛盾调解正在社区发酵，邻里的温度等你添一把。",
+      "source": "world",
+      "linkedEvent": "E8-80",
+      "choices": [
+        {
+          "label": "出一份力",
+          "hint": "社交+4",
+          "effect": {
+            "social": 4
+          }
+        },
+        {
+          "label": "点赞支持",
+          "hint": "社交+2",
+          "effect": {
+            "social": 2
+          }
+        }
+      ]
+    },
+    {
       "id": "Q_E6-60",
       "title": "把握·经济繁荣波",
       "desc": "经济繁荣波，市井烟火正旺，机会在眼前。",
@@ -304,29 +365,6 @@ export const WORLD_STATE = {
           }
         }
       ]
-    },
-    {
-      "id": "Q_E4-40",
-      "title": "参与·邻里互助公约",
-      "desc": "邻里互助公约正在社区发酵，邻里的温度等你添一把。",
-      "source": "world",
-      "linkedEvent": "E4-40",
-      "choices": [
-        {
-          "label": "出一份力",
-          "hint": "社交+4",
-          "effect": {
-            "social": 4
-          }
-        },
-        {
-          "label": "点赞支持",
-          "hint": "社交+2",
-          "effect": {
-            "social": 2
-          }
-        }
-      ]
     }
   ],
   "trend": {
@@ -335,6 +373,7 @@ export const WORLD_STATE = {
       39.3,
       48.6,
       66.6,
+      70.6,
       70.6,
       70.6,
       70.6
@@ -346,7 +385,8 @@ export const WORLD_STATE = {
       7.4,
       7,
       4.9,
-      2
+      2,
+      0
     ],
     "mood": [
       72.5,
@@ -355,7 +395,8 @@ export const WORLD_STATE = {
       71.1,
       71.4,
       70.5,
-      71.2
+      71.2,
+      72.8
     ],
     "currency": [
       53.8,
@@ -364,7 +405,8 @@ export const WORLD_STATE = {
       59.6,
       69.1,
       70.9,
-      77.1
+      77.1,
+      86.8
     ],
     "satisfaction": [
       67.1,
@@ -373,21 +415,22 @@ export const WORLD_STATE = {
       65.5,
       67.5,
       71.9,
-      77.3
+      77.3,
+      88.1
     ]
   },
   "goals": [
     {
       "id": "satisfaction",
       "name": "公民满意度 ≥ 60",
-      "metric": "77.3",
+      "metric": "88.1",
       "target": "60",
       "status": "达标"
     },
     {
       "id": "mood",
       "name": "情绪指数 ≥ 60",
-      "metric": "71.2",
+      "metric": "72.8",
       "target": "60",
       "status": "达标"
     },
@@ -408,7 +451,7 @@ export const WORLD_STATE = {
     {
       "id": "conflict",
       "name": "冲突指数 ≤ 20",
-      "metric": "2.0",
+      "metric": "0.0",
       "target": "20",
       "status": "达标"
     },
