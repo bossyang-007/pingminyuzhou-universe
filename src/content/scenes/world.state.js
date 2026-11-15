@@ -19,23 +19,23 @@ export const WORLD_STATE = {
   },
   "simYear": 2026,
   "realYear": 2026,
-  "lastSync": "2026-11-15T03:04:01.591Z",
-  "tick": 7,
-  "rngState": 2391886062,
+  "lastSync": "2026-11-15T09:06:18.990Z",
+  "tick": 8,
+  "rngState": 4159510678,
   "calendar": {
-    "day": 14,
+    "day": 16,
     "year": 2026,
     "season": "冬",
     "dayType": "工作日"
   },
   "ledger": {
-    "currency": 70.9,
-    "energy": 59.3,
-    "mood": 70.5,
+    "currency": 77.1,
+    "energy": 59.6,
+    "mood": 71.2,
     "link": 100,
-    "satisfaction": 71.9,
+    "satisfaction": 77.3,
     "explore": 70.6,
-    "conflict": 4.9
+    "conflict": 2
   },
   "activeEvents": [
     {
@@ -45,8 +45,8 @@ export const WORLD_STATE = {
       "kind": "economy",
       "color": "#9be86b",
       "severity": 2,
-      "age": 0,
-      "dur": 3,
+      "age": 1,
+      "dur": 2,
       "eff": {
         "currency": 16,
         "mood": 6
@@ -61,8 +61,8 @@ export const WORLD_STATE = {
       "kind": "peace",
       "color": "#8be0ff",
       "severity": 1,
-      "age": 1,
-      "dur": 4,
+      "age": 2,
+      "dur": 3,
       "eff": {
         "conflict": -14,
         "satisfaction": 6
@@ -77,8 +77,8 @@ export const WORLD_STATE = {
       "kind": "social",
       "color": "#7be0a0",
       "severity": 3,
-      "age": 2,
-      "dur": 2,
+      "age": 3,
+      "dur": 1,
       "eff": {
         "satisfaction": 10,
         "link": 8
@@ -108,6 +108,22 @@ export const WORLD_STATE = {
     }
   ],
   "interactions": [
+    {
+      "clock": "2026-D16 (冬/工作日)",
+      "from": "世界中枢",
+      "to": "市井",
+      "kind": "调控",
+      "detail": "平滑物价与小微信贷，托底民生镜像",
+      "effect": "货币流通趋稳"
+    },
+    {
+      "clock": "2026-D16 (冬/工作日)",
+      "from": "邻里自治",
+      "to": "社区",
+      "kind": "共治",
+      "detail": "互助公约与迁徙安置由社区镜像协同",
+      "effect": "满意度与联通回升"
+    },
     {
       "clock": "2026-D14 (冬/工作日)",
       "from": "世界中枢",
@@ -320,6 +336,7 @@ export const WORLD_STATE = {
       48.6,
       66.6,
       70.6,
+      70.6,
       70.6
     ],
     "conflict": [
@@ -328,7 +345,8 @@ export const WORLD_STATE = {
       6.5,
       7.4,
       7,
-      4.9
+      4.9,
+      2
     ],
     "mood": [
       72.5,
@@ -336,7 +354,8 @@ export const WORLD_STATE = {
       71.2,
       71.1,
       71.4,
-      70.5
+      70.5,
+      71.2
     ],
     "currency": [
       53.8,
@@ -344,7 +363,8 @@ export const WORLD_STATE = {
       55.2,
       59.6,
       69.1,
-      70.9
+      70.9,
+      77.1
     ],
     "satisfaction": [
       67.1,
@@ -352,21 +372,22 @@ export const WORLD_STATE = {
       66.7,
       65.5,
       67.5,
-      71.9
+      71.9,
+      77.3
     ]
   },
   "goals": [
     {
       "id": "satisfaction",
       "name": "公民满意度 ≥ 60",
-      "metric": "71.9",
+      "metric": "77.3",
       "target": "60",
       "status": "达标"
     },
     {
       "id": "mood",
       "name": "情绪指数 ≥ 60",
-      "metric": "70.5",
+      "metric": "71.2",
       "target": "60",
       "status": "达标"
     },
@@ -387,7 +408,7 @@ export const WORLD_STATE = {
     {
       "id": "conflict",
       "name": "冲突指数 ≤ 20",
-      "metric": "4.9",
+      "metric": "2.0",
       "target": "20",
       "status": "达标"
     },
