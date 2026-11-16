@@ -19,25 +19,40 @@ export const WORLD_STATE = {
   },
   "simYear": 2026,
   "realYear": 2026,
-  "lastSync": "2026-11-15T21:08:51.742Z",
-  "tick": 10,
-  "rngState": 3335851417,
+  "lastSync": "2026-11-16T14:36:35.039Z",
+  "tick": 11,
+  "rngState": 2008238880,
   "calendar": {
-    "day": 20,
+    "day": 22,
     "year": 2026,
     "season": "冬",
-    "dayType": "周末"
+    "dayType": "工作日"
   },
   "ledger": {
     "currency": 100,
-    "energy": 61,
-    "mood": 80.2,
-    "link": 100,
-    "satisfaction": 93.3,
+    "energy": 60.3,
+    "mood": 83.3,
+    "link": 99.6,
+    "satisfaction": 100,
     "explore": 70.6,
     "conflict": 0
   },
   "activeEvents": [
+    {
+      "id": "E10-100",
+      "type": "sentiment",
+      "name": "舆情波澜",
+      "kind": "crisis",
+      "color": "#ff9b9b",
+      "severity": 3,
+      "age": 0,
+      "dur": 3,
+      "eff": {
+        "mood": -16
+      },
+      "bornTick": 10,
+      "bornAt": "2026-D22"
+    },
     {
       "id": "E9-90",
       "type": "boom",
@@ -45,8 +60,8 @@ export const WORLD_STATE = {
       "kind": "economy",
       "color": "#9be86b",
       "severity": 3,
-      "age": 0,
-      "dur": 4,
+      "age": 1,
+      "dur": 3,
       "eff": {
         "currency": 16,
         "mood": 6
@@ -61,8 +76,8 @@ export const WORLD_STATE = {
       "kind": "social",
       "color": "#9be0b0",
       "severity": 2,
-      "age": 1,
-      "dur": 2,
+      "age": 2,
+      "dur": 1,
       "eff": {
         "conflict": -10,
         "satisfaction": 6,
@@ -70,25 +85,15 @@ export const WORLD_STATE = {
       },
       "bornTick": 8,
       "bornAt": "2026-D18"
-    },
-    {
-      "id": "E5-50",
-      "type": "peace",
-      "name": "和平协定",
-      "kind": "peace",
-      "color": "#8be0ff",
-      "severity": 1,
-      "age": 4,
-      "dur": 1,
-      "eff": {
-        "conflict": -14,
-        "satisfaction": 6
-      },
-      "bornTick": 5,
-      "bornAt": "2026-D12"
     }
   ],
   "history": [
+    {
+      "tick": 10,
+      "name": "和平协定",
+      "kind": "peace",
+      "outcome": "自然落幕"
+    },
     {
       "tick": 9,
       "name": "经济繁荣波",
@@ -121,6 +126,30 @@ export const WORLD_STATE = {
     }
   ],
   "interactions": [
+    {
+      "clock": "2026-D22 (冬/工作日)",
+      "from": "世界中枢",
+      "to": "受影响区域",
+      "kind": "调度",
+      "detail": "下发 1 项危机预案，启动数字孪生预演与跨区互济",
+      "effect": "危机进入闭环"
+    },
+    {
+      "clock": "2026-D22 (冬/工作日)",
+      "from": "世界中枢",
+      "to": "市井",
+      "kind": "调控",
+      "detail": "平滑物价与小微信贷，托底民生镜像",
+      "effect": "货币流通趋稳"
+    },
+    {
+      "clock": "2026-D22 (冬/工作日)",
+      "from": "邻里自治",
+      "to": "社区",
+      "kind": "共治",
+      "detail": "互助公约与迁徙安置由社区镜像协同",
+      "effect": "满意度与联通回升"
+    },
     {
       "clock": "2026-D20 (冬/周末)",
       "from": "世界中枢",
@@ -192,33 +221,19 @@ export const WORLD_STATE = {
       "kind": "共治",
       "detail": "互助公约与迁徙安置由社区镜像协同",
       "effect": "满意度与联通回升"
-    },
-    {
-      "clock": "2026-D10 (冬/工作日)",
-      "from": "邻里自治",
-      "to": "社区",
-      "kind": "共治",
-      "detail": "互助公约与迁徙安置由社区镜像协同",
-      "effect": "满意度与联通回升"
-    },
-    {
-      "clock": "2026-D8 (冬/工作日)",
-      "from": "开源社群",
-      "to": "全宇宙",
-      "kind": "扩散",
-      "detail": "新技术/奇观向平民开放，鼓励探索与创作",
-      "effect": "探索进度上升"
-    },
-    {
-      "clock": "2026-D6 (冬/周末)",
-      "from": "开源社群",
-      "to": "全宇宙",
-      "kind": "扩散",
-      "detail": "新技术/奇观向平民开放，鼓励探索与创作",
-      "effect": "探索进度上升"
     }
   ],
   "feed": [
+    {
+      "year": 2026,
+      "kind": "event",
+      "text": "【预警】舆情波澜：一则民生议题在镜像社区发酵，情绪指数剧烈摆动，中枢启动答疑闭环（严重度 3）。"
+    },
+    {
+      "year": 2026,
+      "kind": "end",
+      "text": "【落幕】和平协定（邻里间缔结互助与分歧化解公约，冲突指数回落，社区更安（严重度 1）。）已结束。"
+    },
     {
       "year": 2026,
       "kind": "event",
@@ -312,6 +327,31 @@ export const WORLD_STATE = {
   ],
   "quests": [
     {
+      "id": "Q_E10-100",
+      "title": "应对·舆情波澜",
+      "desc": "舆情波澜来袭（严重度 3），中枢号召平民共渡。",
+      "source": "world",
+      "linkedEvent": "E10-100",
+      "choices": [
+        {
+          "label": "参与应对",
+          "hint": "精力-3 快乐+2 声望+2",
+          "effect": {
+            "energy": -3,
+            "happy": 2,
+            "reputation": 2
+          }
+        },
+        {
+          "label": "做好自护",
+          "hint": "健康+2",
+          "effect": {
+            "health": 2
+          }
+        }
+      ]
+    },
+    {
       "id": "Q_E9-90",
       "title": "把握·经济繁荣波",
       "desc": "经济繁荣波，市井烟火正旺，机会在眼前。",
@@ -357,30 +397,6 @@ export const WORLD_STATE = {
           }
         }
       ]
-    },
-    {
-      "id": "Q_E5-50",
-      "title": "守护·和平协定",
-      "desc": "和平协定缔结，社区更安宁。",
-      "source": "world",
-      "linkedEvent": "E5-50",
-      "choices": [
-        {
-          "label": "参与公约",
-          "hint": "社交+3 快乐+2",
-          "effect": {
-            "social": 3,
-            "happy": 2
-          }
-        },
-        {
-          "label": "乐见其成",
-          "hint": "快乐+1",
-          "effect": {
-            "happy": 1
-          }
-        }
-      ]
     }
   ],
   "trend": {
@@ -389,6 +405,7 @@ export const WORLD_STATE = {
       39.3,
       48.6,
       66.6,
+      70.6,
       70.6,
       70.6,
       70.6,
@@ -404,6 +421,7 @@ export const WORLD_STATE = {
       4.9,
       2,
       0,
+      0,
       0
     ],
     "mood": [
@@ -415,7 +433,8 @@ export const WORLD_STATE = {
       70.5,
       71.2,
       72.8,
-      80.2
+      80.2,
+      83.3
     ],
     "currency": [
       53.8,
@@ -426,6 +445,7 @@ export const WORLD_STATE = {
       70.9,
       77.1,
       86.8,
+      100,
       100
     ],
     "satisfaction": [
@@ -437,28 +457,29 @@ export const WORLD_STATE = {
       71.9,
       77.3,
       88.1,
-      93.3
+      93.3,
+      100
     ]
   },
   "goals": [
     {
       "id": "satisfaction",
       "name": "公民满意度 ≥ 60",
-      "metric": "93.3",
+      "metric": "100.0",
       "target": "60",
       "status": "达标"
     },
     {
       "id": "mood",
       "name": "情绪指数 ≥ 60",
-      "metric": "80.2",
+      "metric": "83.3",
       "target": "60",
       "status": "达标"
     },
     {
       "id": "link",
       "name": "数字联通度 ≥ 70",
-      "metric": "100.0",
+      "metric": "99.6",
       "target": "70",
       "status": "达标"
     },
