@@ -19,19 +19,19 @@ export const HZ_STATE = {
       "carbonFloorRatio": 0
     }
   },
-  "simYear": 2058,
+  "simYear": 2060,
   "realYear": 2026,
-  "lastSync": "2026-11-15T19:01:04.266Z",
-  "tick": 7,
-  "rngState": 1462158601,
+  "lastSync": "2026-11-16T19:00:55.127Z",
+  "tick": 8,
+  "rngState": 1887018080,
   "clock": {
-    "day": 1.75,
-    "hour": 2,
-    "doy": 1,
-    "year": 2058,
+    "day": 2,
+    "hour": 8,
+    "doy": 2,
+    "year": 2060,
     "season": "冬",
     "dayType": "节假日",
-    "isDay": false
+    "isDay": true
   },
   "districts": {
     "hz_shangcheng": {
@@ -39,24 +39,24 @@ export const HZ_STATE = {
       "type": "core",
       "pop0": 140.2,
       "pop1": 198,
-      "pop": 177.5,
-      "prosperity": 72.4,
-      "energy": 54.2,
-      "mood": 70.9,
-      "phase": 2,
-      "renew": 70.6,
-      "green": 53,
+      "pop": 179.8,
+      "prosperity": 71.8,
+      "energy": 78.3,
+      "mood": 67.2,
+      "phase": 8,
+      "renew": 72.2,
+      "green": 54.5,
       "env": {
-        "weather": "多云",
+        "weather": "霾",
         "season": "冬",
-        "isDay": false,
-        "tempC": 3.4,
-        "aqi": 105,
-        "humidity": 60,
-        "traffic": 94,
+        "isDay": true,
+        "tempC": 8.5,
+        "aqi": 163,
+        "humidity": 64,
+        "traffic": 92,
         "grid": 57,
         "water": null,
-        "network": 54
+        "network": 49
       }
     },
     "hz_gongshu": {
@@ -64,24 +64,24 @@ export const HZ_STATE = {
       "type": "core",
       "pop0": 120.1,
       "pop1": 168,
-      "pop": 151,
-      "prosperity": 74,
-      "energy": 52.9,
-      "mood": 69.3,
-      "phase": 2,
-      "renew": 71.7,
-      "green": 56.1,
+      "pop": 152.4,
+      "prosperity": 75.6,
+      "energy": 80.3,
+      "mood": 69.4,
+      "phase": 8,
+      "renew": 73.2,
+      "green": 57.4,
       "env": {
         "weather": "霾",
         "season": "冬",
-        "isDay": false,
-        "tempC": 4.8,
-        "aqi": 169,
-        "humidity": 57,
-        "traffic": 64,
-        "grid": 45,
+        "isDay": true,
+        "tempC": 10.1,
+        "aqi": 207,
+        "humidity": 64,
+        "traffic": 91,
+        "grid": 51,
         "water": null,
-        "network": 54
+        "network": 52
       }
     },
     "hz_xihu": {
@@ -89,23 +89,23 @@ export const HZ_STATE = {
       "type": "core",
       "pop0": 118,
       "pop1": 160,
-      "pop": 144.6,
-      "prosperity": 76.4,
-      "energy": 52.6,
-      "mood": 70.4,
-      "phase": 2,
-      "renew": 72.4,
-      "green": 62.9,
+      "pop": 146.7,
+      "prosperity": 77.2,
+      "energy": 80.2,
+      "mood": 70.6,
+      "phase": 8,
+      "renew": 73.8,
+      "green": 64,
       "env": {
-        "weather": "多云",
+        "weather": "晴",
         "season": "冬",
-        "isDay": false,
-        "tempC": -1.8,
-        "aqi": 112,
-        "humidity": 60,
-        "traffic": 69,
-        "grid": 48,
-        "water": 58,
+        "isDay": true,
+        "tempC": 0.9,
+        "aqi": 103,
+        "humidity": 64,
+        "traffic": 96,
+        "grid": 60,
+        "water": 56,
         "network": 52
       }
     },
@@ -114,22 +114,22 @@ export const HZ_STATE = {
       "type": "core",
       "pop0": 55.9,
       "pop1": 92,
-      "pop": 78.6,
-      "prosperity": 79.8,
-      "energy": 52,
-      "mood": 72.4,
-      "phase": 2,
-      "renew": 74.2,
-      "green": 59.2,
+      "pop": 80.7,
+      "prosperity": 80.1,
+      "energy": 78.2,
+      "mood": 72.1,
+      "phase": 8,
+      "renew": 75.4,
+      "green": 60.4,
       "env": {
-        "weather": "晴",
+        "weather": "雨",
         "season": "冬",
-        "isDay": false,
-        "tempC": 4,
-        "aqi": 98,
-        "humidity": 60,
-        "traffic": 64,
-        "grid": 49,
+        "isDay": true,
+        "tempC": 4.9,
+        "aqi": 73,
+        "humidity": 90,
+        "traffic": 84,
+        "grid": 53,
         "water": null,
         "network": 49
       }
@@ -139,23 +139,23 @@ export const HZ_STATE = {
       "type": "star",
       "pop0": 218.4,
       "pop1": 300,
-      "pop": 270.8,
-      "prosperity": 81.5,
-      "energy": 52.5,
-      "mood": 68.3,
-      "phase": 2,
-      "renew": 72.4,
-      "green": 58,
+      "pop": 273.6,
+      "prosperity": 80.7,
+      "energy": 76.8,
+      "mood": 67,
+      "phase": 8,
+      "renew": 73.8,
+      "green": 59.2,
       "env": {
-        "weather": "霾",
+        "weather": "多云",
         "season": "冬",
-        "isDay": false,
-        "tempC": 1.8,
-        "aqi": 151,
-        "humidity": 60,
-        "traffic": 53,
-        "grid": 49,
-        "water": 56,
+        "isDay": true,
+        "tempC": 4.5,
+        "aqi": 168,
+        "humidity": 59,
+        "traffic": 81,
+        "grid": 50,
+        "water": 59,
         "network": 51
       }
     },
@@ -164,22 +164,22 @@ export const HZ_STATE = {
       "type": "star",
       "pop0": 143.8,
       "pop1": 215,
-      "pop": 189.4,
-      "prosperity": 80,
-      "energy": 49.7,
-      "mood": 70.2,
-      "phase": 2,
-      "renew": 76,
-      "green": 61.7,
+      "pop": 192,
+      "prosperity": 81,
+      "energy": 75.3,
+      "mood": 70.8,
+      "phase": 8,
+      "renew": 77,
+      "green": 62.8,
       "env": {
         "weather": "晴",
         "season": "冬",
-        "isDay": false,
-        "tempC": 2.1,
-        "aqi": 132,
-        "humidity": 58,
-        "traffic": 47,
-        "grid": 45,
+        "isDay": true,
+        "tempC": 7.8,
+        "aqi": 112,
+        "humidity": 63,
+        "traffic": 71,
+        "grid": 51,
         "water": null,
         "network": 50
       }
@@ -189,24 +189,24 @@ export const HZ_STATE = {
       "type": "star",
       "pop0": 116,
       "pop1": 168,
-      "pop": 148.9,
-      "prosperity": 71.8,
-      "energy": 49.5,
-      "mood": 70.1,
-      "phase": 2,
-      "renew": 74.2,
-      "green": 59.2,
+      "pop": 151.1,
+      "prosperity": 75.6,
+      "energy": 77.7,
+      "mood": 73.6,
+      "phase": 8,
+      "renew": 75.4,
+      "green": 60.4,
       "env": {
-        "weather": "雨",
+        "weather": "晴",
         "season": "冬",
-        "isDay": false,
-        "tempC": -0.5,
-        "aqi": 71,
-        "humidity": 81,
-        "traffic": 46,
-        "grid": 41,
+        "isDay": true,
+        "tempC": 7.6,
+        "aqi": 98,
+        "humidity": 55,
+        "traffic": 68,
+        "grid": 52,
         "water": null,
-        "network": 52
+        "network": 50
       }
     },
     "hz_qiantang": {
@@ -214,24 +214,24 @@ export const HZ_STATE = {
       "type": "star",
       "pop0": 81,
       "pop1": 122,
-      "pop": 107.3,
-      "prosperity": 80.1,
-      "energy": 48.1,
-      "mood": 69.1,
-      "phase": 2,
-      "renew": 77.8,
-      "green": 60.4,
+      "pop": 108.9,
+      "prosperity": 82.8,
+      "energy": 76.9,
+      "mood": 72.5,
+      "phase": 8,
+      "renew": 78.6,
+      "green": 61.6,
       "env": {
-        "weather": "多云",
+        "weather": "晴",
         "season": "冬",
-        "isDay": false,
-        "tempC": -1.2,
-        "aqi": 99,
-        "humidity": 63,
-        "traffic": 43,
-        "grid": 44,
-        "water": 57,
-        "network": 52
+        "isDay": true,
+        "tempC": 5.2,
+        "aqi": 98,
+        "humidity": 59,
+        "traffic": 70,
+        "grid": 53,
+        "water": 58,
+        "network": 53
       }
     },
     "hz_fuyang": {
@@ -239,24 +239,24 @@ export const HZ_STATE = {
       "type": "star",
       "pop0": 86.4,
       "pop1": 120,
-      "pop": 107.9,
-      "prosperity": 79.9,
-      "energy": 48.9,
-      "mood": 65.2,
-      "phase": 2,
-      "renew": 74.2,
-      "green": 65.4,
+      "pop": 109.5,
+      "prosperity": 82.7,
+      "energy": 77.6,
+      "mood": 72.6,
+      "phase": 8,
+      "renew": 75.4,
+      "green": 66.3,
       "env": {
-        "weather": "霾",
+        "weather": "雨",
         "season": "冬",
-        "isDay": false,
-        "tempC": 2.3,
-        "aqi": 152,
-        "humidity": 60,
-        "traffic": 49,
-        "grid": 45,
+        "isDay": true,
+        "tempC": 3.5,
+        "aqi": 63,
+        "humidity": 82,
+        "traffic": 75,
+        "grid": 52,
         "water": null,
-        "network": 56
+        "network": 52
       }
     },
     "hz_linan": {
@@ -264,24 +264,24 @@ export const HZ_STATE = {
       "type": "star",
       "pop0": 65.7,
       "pop1": 92,
-      "pop": 82.7,
-      "prosperity": 81.4,
-      "energy": 51.2,
-      "mood": 71.1,
-      "phase": 2,
-      "renew": 77.8,
-      "green": 82.6,
+      "pop": 83.3,
+      "prosperity": 83.3,
+      "energy": 77.1,
+      "mood": 71.7,
+      "phase": 8,
+      "renew": 78.6,
+      "green": 82.9,
       "env": {
-        "weather": "多云",
+        "weather": "晴",
         "season": "冬",
-        "isDay": false,
-        "tempC": 0,
-        "aqi": 89,
-        "humidity": 55,
-        "traffic": 52,
-        "grid": 44,
+        "isDay": true,
+        "tempC": 4.4,
+        "aqi": 97,
+        "humidity": 60,
+        "traffic": 78,
+        "grid": 54,
         "water": 57,
-        "network": 50
+        "network": 54
       }
     },
     "hz_tonglu": {
@@ -289,24 +289,24 @@ export const HZ_STATE = {
       "type": "eco",
       "pop0": 46.2,
       "pop1": 64,
-      "pop": 57.6,
-      "prosperity": 75.7,
-      "energy": 47.3,
-      "mood": 69.2,
-      "phase": 2,
-      "renew": 79.6,
-      "green": 78.9,
+      "pop": 58.1,
+      "prosperity": 76.4,
+      "energy": 73.9,
+      "mood": 70.5,
+      "phase": 8,
+      "renew": 80.2,
+      "green": 79.3,
       "env": {
         "weather": "晴",
         "season": "冬",
-        "isDay": false,
-        "tempC": 1.1,
-        "aqi": 73,
-        "humidity": 59,
-        "traffic": 36,
-        "grid": 49,
+        "isDay": true,
+        "tempC": 8,
+        "aqi": 68,
+        "humidity": 63,
+        "traffic": 63,
+        "grid": 50,
         "water": null,
-        "network": 53
+        "network": 51
       }
     },
     "hz_chunan": {
@@ -314,24 +314,24 @@ export const HZ_STATE = {
       "type": "eco",
       "pop0": 31.7,
       "pop1": 44,
-      "pop": 39.5,
-      "prosperity": 77.5,
-      "energy": 47.4,
-      "mood": 69,
-      "phase": 2,
-      "renew": 80.3,
-      "green": 83.8,
+      "pop": 39.8,
+      "prosperity": 78.2,
+      "energy": 74.2,
+      "mood": 70.5,
+      "phase": 8,
+      "renew": 80.8,
+      "green": 84.1,
       "env": {
-        "weather": "霾",
+        "weather": "多云",
         "season": "冬",
-        "isDay": false,
-        "tempC": 1.5,
-        "aqi": 138,
-        "humidity": 62,
-        "traffic": 38,
-        "grid": 49,
-        "water": 58,
-        "network": 52
+        "isDay": true,
+        "tempC": 4.7,
+        "aqi": 68,
+        "humidity": 58,
+        "traffic": 65,
+        "grid": 53,
+        "water": 61,
+        "network": 51
       }
     },
     "hz_jiande": {
@@ -339,60 +339,90 @@ export const HZ_STATE = {
       "type": "eco",
       "pop0": 44.2,
       "pop1": 62,
-      "pop": 55.5,
-      "prosperity": 74.3,
-      "energy": 50.2,
-      "mood": 71.5,
-      "phase": 2,
-      "renew": 79.6,
-      "green": 80.8,
+      "pop": 56.1,
+      "prosperity": 78.7,
+      "energy": 77.8,
+      "mood": 74.2,
+      "phase": 8,
+      "renew": 80.2,
+      "green": 81.1,
       "env": {
-        "weather": "霾",
+        "weather": "晴",
         "season": "冬",
-        "isDay": false,
-        "tempC": 0.5,
-        "aqi": 137,
-        "humidity": 55,
-        "traffic": 41,
-        "grid": 43,
-        "water": 60,
-        "network": 50
+        "isDay": true,
+        "tempC": 4.2,
+        "aqi": 75,
+        "humidity": 58,
+        "traffic": 64,
+        "grid": 50,
+        "water": 55,
+        "network": 53
       }
     }
   },
   "actors": {
     "citizens": {
-      "satisfaction": 69.7,
-      "activity": 50.5,
-      "mobility": 53.5
+      "satisfaction": 71,
+      "activity": 77.3,
+      "mobility": 76.8
     },
     "enterprises": {
-      "output": 77.3,
-      "hiring": 67.4,
-      "energyDemand": 57
+      "output": 78.8,
+      "hiring": 69.5,
+      "energyDemand": 60
     },
     "cityBrain": {
-      "load": 55.3,
+      "load": 68.4,
       "syncRate": 97.2,
       "decisions": 7,
       "dispatched": 7
     },
     "ecology": {
-      "carbonIndex": 35.2,
+      "carbonIndex": 33.3,
       "waterQuality": 57.7,
-      "greenAvg": 66.3
+      "greenAvg": 67.2
     },
     "visitors": {
-      "flow": 67.6,
+      "flow": 68.4,
       "spend": 70
     }
   },
   "anomalies": [
     {
+      "id": "A7-70",
+      "type": "地铁故障",
+      "scope": "hz_shangcheng",
+      "severity": 4.4,
+      "status": "active",
+      "bornTick": 7,
+      "bornAt": "2060-D2 8:00",
+      "response": "公交加密 + 低空通勤分流 + 信号自适应 + 闸机限流"
+    },
+    {
+      "id": "A7-71",
+      "type": "空气重污染",
+      "scope": "hz_shangcheng",
+      "severity": 4.1,
+      "status": "active",
+      "bornTick": 7,
+      "bornAt": "2060-D2 8:00",
+      "response": "工业限产 + 扬尘管控 + 生态绿廊净化 + 错峰通行"
+    },
+    {
+      "id": "A7-72",
+      "type": "游客激增",
+      "scope": "hz_shangcheng",
+      "severity": 4.1,
+      "status": "active",
+      "bornTick": 7,
+      "bornAt": "2060-D2 8:00",
+      "response": "预约限流 + 低空接驳 + 民宿镜像扩容 + 治安联动"
+    },
+    {
       "id": "A6-60",
       "type": "空气重污染",
       "scope": "hz_gongshu",
-      "severity": 2.5,
+      "severity": 1.2,
       "status": "active",
       "bornTick": 6,
       "bornAt": "2058-D1 2:00",
@@ -402,7 +432,7 @@ export const HZ_STATE = {
       "id": "A6-61",
       "type": "寒潮",
       "scope": "hz_xihu",
-      "severity": 2.3,
+      "severity": 0.8,
       "status": "active",
       "bornTick": 6,
       "bornAt": "2058-D1 2:00",
@@ -412,7 +442,7 @@ export const HZ_STATE = {
       "id": "A6-62",
       "type": "空气重污染",
       "scope": "hz_xiaoshan",
-      "severity": 5,
+      "severity": 3.4,
       "status": "active",
       "bornTick": 6,
       "bornAt": "2058-D1 2:00",
@@ -422,27 +452,29 @@ export const HZ_STATE = {
       "id": "A5-50",
       "type": "游客激增",
       "scope": "hz_shangcheng",
-      "severity": 0.4,
-      "status": "active",
+      "severity": -1,
+      "status": "resolved",
       "bornTick": 5,
       "bornAt": "2056-D1 20:00",
-      "response": "预约限流 + 低空接驳 + 民宿镜像扩容 + 治安联动"
+      "response": "预约限流 + 低空接驳 + 民宿镜像扩容 + 治安联动",
+      "recoveredAt": "2060-D2"
     },
     {
       "id": "A5-51",
       "type": "空气重污染",
       "scope": "hz_yuhang",
-      "severity": 1.1,
-      "status": "active",
+      "severity": -0.6,
+      "status": "resolved",
       "bornTick": 5,
       "bornAt": "2056-D1 20:00",
-      "response": "工业限产 + 扬尘管控 + 生态绿廊净化 + 错峰通行"
+      "response": "工业限产 + 扬尘管控 + 生态绿廊净化 + 错峰通行",
+      "recoveredAt": "2060-D2"
     },
     {
       "id": "A5-52",
       "type": "舆情波动",
       "scope": "city",
-      "severity": 2.6,
+      "severity": 1.4,
       "status": "active",
       "bornTick": 5,
       "bornAt": "2056-D1",
@@ -452,11 +484,12 @@ export const HZ_STATE = {
       "id": "A4-40",
       "type": "游客激增",
       "scope": "hz_shangcheng",
-      "severity": 0.5,
-      "status": "active",
+      "severity": -0.9,
+      "status": "resolved",
       "bornTick": 4,
       "bornAt": "2055-D1 14:00",
-      "response": "预约限流 + 低空接驳 + 民宿镜像扩容 + 治安联动"
+      "response": "预约限流 + 低空接驳 + 民宿镜像扩容 + 治安联动",
+      "recoveredAt": "2060-D2"
     },
     {
       "id": "A3-30",
@@ -538,7 +571,7 @@ export const HZ_STATE = {
   ],
   "interactions": [
     {
-      "clock": "2058-D1 02:00",
+      "clock": "2060-D2 08:00",
       "kind": "commute",
       "from": "萧山区",
       "to": "上城区",
@@ -546,7 +579,7 @@ export const HZ_STATE = {
       "effect": "缓解核心区路面压力"
     },
     {
-      "clock": "2058-D1 02:00",
+      "clock": "2060-D2 08:00",
       "kind": "commute",
       "from": "余杭区",
       "to": "滨江区",
@@ -554,7 +587,7 @@ export const HZ_STATE = {
       "effect": "缓解核心区路面压力"
     },
     {
-      "clock": "2058-D1 02:00",
+      "clock": "2060-D2 08:00",
       "kind": "commute",
       "from": "临平区",
       "to": "上城区",
@@ -562,7 +595,7 @@ export const HZ_STATE = {
       "effect": "缓解核心区路面压力"
     },
     {
-      "clock": "2058-D1 02:00",
+      "clock": "2060-D2 08:00",
       "kind": "commute",
       "from": "钱塘区",
       "to": "滨江区",
@@ -570,7 +603,7 @@ export const HZ_STATE = {
       "effect": "缓解核心区路面压力"
     },
     {
-      "clock": "2058-D1 02:00",
+      "clock": "2060-D2 08:00",
       "kind": "commute",
       "from": "富阳区",
       "to": "西湖区",
@@ -578,7 +611,7 @@ export const HZ_STATE = {
       "effect": "缓解核心区路面压力"
     },
     {
-      "clock": "2058-D1 02:00",
+      "clock": "2060-D2 08:00",
       "kind": "commute",
       "from": "临安区",
       "to": "余杭区",
@@ -586,7 +619,7 @@ export const HZ_STATE = {
       "effect": "缓解核心区路面压力"
     },
     {
-      "clock": "2058-D1 02:00",
+      "clock": "2060-D2 08:00",
       "kind": "commute",
       "from": "桐庐县",
       "to": "西湖区",
@@ -594,7 +627,7 @@ export const HZ_STATE = {
       "effect": "缓解核心区路面压力"
     },
     {
-      "clock": "2058-D1 02:00",
+      "clock": "2060-D2 08:00",
       "kind": "commute",
       "from": "淳安县",
       "to": "上城区",
@@ -602,7 +635,7 @@ export const HZ_STATE = {
       "effect": "缓解核心区路面压力"
     },
     {
-      "clock": "2058-D1 02:00",
+      "clock": "2060-D2 08:00",
       "kind": "commute",
       "from": "建德市",
       "to": "上城区",
@@ -610,7 +643,7 @@ export const HZ_STATE = {
       "effect": "缓解核心区路面压力"
     },
     {
-      "clock": "2058-D1 02:00",
+      "clock": "2060-D2 08:00",
       "kind": "visitor",
       "from": "外围客流",
       "to": "上城区/西湖区/萧山区/桐庐县/淳安县/建德市",
@@ -618,7 +651,7 @@ export const HZ_STATE = {
       "effect": "拉动文旅消费与交通负荷"
     },
     {
-      "clock": "2058-D1 02:00",
+      "clock": "2060-D2 08:00",
       "kind": "policy",
       "from": "城市中枢",
       "to": "全市",
@@ -626,7 +659,7 @@ export const HZ_STATE = {
       "effect": "异常进入闭环"
     },
     {
-      "clock": "2056-D1 20:00",
+      "clock": "2058-D1 02:00",
       "kind": "commute",
       "from": "萧山区",
       "to": "上城区",
@@ -635,6 +668,46 @@ export const HZ_STATE = {
     }
   ],
   "feed": [
+    {
+      "year": 2060,
+      "kind": "alert",
+      "text": "【预警】上城区触发「地铁故障」(严重度 4.4)，中枢启动：公交加密 + 低空通勤分流 + 信号自适应 + 闸机限流。"
+    },
+    {
+      "year": 2060,
+      "kind": "alert",
+      "text": "【预警】上城区触发「空气重污染」(严重度 4.1)，中枢启动：工业限产 + 扬尘管控 + 生态绿廊净化 + 错峰通行。"
+    },
+    {
+      "year": 2060,
+      "kind": "alert",
+      "text": "【预警】上城区触发「游客激增」(严重度 4.1)，中枢启动：预约限流 + 低空接驳 + 民宿镜像扩容 + 治安联动。"
+    },
+    {
+      "year": 2060,
+      "kind": "life",
+      "text": "余杭区社区镜像完成零碳微改造，邻里能量与情绪双双回升。"
+    },
+    {
+      "year": 2060,
+      "kind": "life",
+      "text": "余杭区的潮汐/水温空调为全城节省一次峰值负荷，绿电跨区互济生效。"
+    },
+    {
+      "year": 2060,
+      "kind": "recover",
+      "text": "【恢复】上城区游客激增已闭环：预约限流 + 低空接驳 + 民宿镜像扩容 + 治安联动。"
+    },
+    {
+      "year": 2060,
+      "kind": "recover",
+      "text": "【恢复】余杭区空气重污染已闭环：工业限产 + 扬尘管控 + 生态绿廊净化 + 错峰通行。"
+    },
+    {
+      "year": 2060,
+      "kind": "recover",
+      "text": "【恢复】上城区游客激增已闭环：预约限流 + 低空接驳 + 民宿镜像扩容 + 治安联动。"
+    },
     {
       "year": 2058,
       "kind": "alert",
@@ -694,130 +767,90 @@ export const HZ_STATE = {
       "year": 2056,
       "kind": "recover",
       "text": "【恢复】萧山区强降雨内涝已闭环：排涝机器人 + 数字孪生内涝预演 + 隧道封控 + 低空巡检。"
-    },
-    {
-      "year": 2056,
-      "kind": "recover",
-      "text": "【恢复】西湖区交通拥堵已闭环：信号自适应 + 低空通勤分流 + 镜像办公引导。"
-    },
-    {
-      "year": 2055,
-      "kind": "alert",
-      "text": "【预警】上城区触发「游客激增」(严重度 3.5)，中枢启动：预约限流 + 低空接驳 + 民宿镜像扩容 + 治安联动。"
-    },
-    {
-      "year": 2055,
-      "kind": "life",
-      "text": "建德市低空物流网把山货与鲜食送抵 30 公里外的餐桌，城乡镜像互通。"
-    },
-    {
-      "year": 2055,
-      "kind": "life",
-      "text": "拱墅区一所全息学堂开课，老人与孩子在镜像宇宙同堂共学。"
-    },
-    {
-      "year": 2055,
-      "kind": "recover",
-      "text": "【恢复】拱墅区寒潮已闭环：热电联产调度 + 暖屋镜像 + 管网防冻巡检。"
-    },
-    {
-      "year": 2055,
-      "kind": "recover",
-      "text": "【恢复】上城区空气重污染已闭环：工业限产 + 扬尘管控 + 生态绿廊净化 + 错峰通行。"
-    },
-    {
-      "year": 2054,
-      "kind": "alert",
-      "text": "【预警】上城区触发「交通拥堵」(严重度 4.7)，中枢启动：信号自适应 + 低空通勤分流 + 镜像办公引导。"
-    },
-    {
-      "year": 2054,
-      "kind": "alert",
-      "text": "【预警】西湖区触发「交通拥堵」(严重度 2.3)，中枢启动：信号自适应 + 低空通勤分流 + 镜像办公引导。"
     }
   ],
   "quests": [
     {
+      "id": "HQ_A7-70",
+      "title": "应对·地铁故障",
+      "desc": "上城区正在处置「地铁故障」（严重度 4.4）：公交加密 + 低空通勤分流 + 信号自适应 + 闸机限流",
+      "source": "hangzhou",
+      "linkedAnomaly": "A7-70",
+      "choices": [
+        {
+          "label": "参与处置",
+          "hint": "精力-3 声望+2 快乐+1",
+          "effect": {
+            "energy": -3,
+            "reputation": 2,
+            "happy": 1
+          }
+        },
+        {
+          "label": "做好自护",
+          "hint": "健康+2",
+          "effect": {
+            "health": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "HQ_A7-71",
+      "title": "应对·空气重污染",
+      "desc": "上城区正在处置「空气重污染」（严重度 4.1）：工业限产 + 扬尘管控 + 生态绿廊净化 + 错峰通行",
+      "source": "hangzhou",
+      "linkedAnomaly": "A7-71",
+      "choices": [
+        {
+          "label": "参与处置",
+          "hint": "精力-3 声望+2 快乐+1",
+          "effect": {
+            "energy": -3,
+            "reputation": 2,
+            "happy": 1
+          }
+        },
+        {
+          "label": "做好自护",
+          "hint": "健康+2",
+          "effect": {
+            "health": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "HQ_A7-72",
+      "title": "应对·游客激增",
+      "desc": "上城区正在处置「游客激增」（严重度 4.1）：预约限流 + 低空接驳 + 民宿镜像扩容 + 治安联动",
+      "source": "hangzhou",
+      "linkedAnomaly": "A7-72",
+      "choices": [
+        {
+          "label": "参与处置",
+          "hint": "精力-3 声望+2 快乐+1",
+          "effect": {
+            "energy": -3,
+            "reputation": 2,
+            "happy": 1
+          }
+        },
+        {
+          "label": "做好自护",
+          "hint": "健康+2",
+          "effect": {
+            "health": 2
+          }
+        }
+      ]
+    },
+    {
       "id": "HQ_A6-60",
       "title": "应对·空气重污染",
-      "desc": "拱墅区正在处置「空气重污染」（严重度 2.5）：工业限产 + 扬尘管控 + 生态绿廊净化 + 错峰通行",
+      "desc": "拱墅区正在处置「空气重污染」（严重度 1.2）：工业限产 + 扬尘管控 + 生态绿廊净化 + 错峰通行",
       "source": "hangzhou",
       "linkedAnomaly": "A6-60",
-      "choices": [
-        {
-          "label": "参与处置",
-          "hint": "精力-3 声望+2 快乐+1",
-          "effect": {
-            "energy": -3,
-            "reputation": 2,
-            "happy": 1
-          }
-        },
-        {
-          "label": "做好自护",
-          "hint": "健康+2",
-          "effect": {
-            "health": 2
-          }
-        }
-      ]
-    },
-    {
-      "id": "HQ_A6-61",
-      "title": "应对·寒潮",
-      "desc": "西湖区正在处置「寒潮」（严重度 2.3）：热电联产调度 + 暖屋镜像 + 管网防冻巡检",
-      "source": "hangzhou",
-      "linkedAnomaly": "A6-61",
-      "choices": [
-        {
-          "label": "参与处置",
-          "hint": "精力-3 声望+2 快乐+1",
-          "effect": {
-            "energy": -3,
-            "reputation": 2,
-            "happy": 1
-          }
-        },
-        {
-          "label": "做好自护",
-          "hint": "健康+2",
-          "effect": {
-            "health": 2
-          }
-        }
-      ]
-    },
-    {
-      "id": "HQ_A6-62",
-      "title": "应对·空气重污染",
-      "desc": "萧山区正在处置「空气重污染」（严重度 5）：工业限产 + 扬尘管控 + 生态绿廊净化 + 错峰通行",
-      "source": "hangzhou",
-      "linkedAnomaly": "A6-62",
-      "choices": [
-        {
-          "label": "参与处置",
-          "hint": "精力-3 声望+2 快乐+1",
-          "effect": {
-            "energy": -3,
-            "reputation": 2,
-            "happy": 1
-          }
-        },
-        {
-          "label": "做好自护",
-          "hint": "健康+2",
-          "effect": {
-            "health": 2
-          }
-        }
-      ]
-    },
-    {
-      "id": "HQ_A5-50",
-      "title": "应对·游客激增",
-      "desc": "上城区正在处置「游客激增」（严重度 0.4）：预约限流 + 低空接驳 + 民宿镜像扩容 + 治安联动",
-      "source": "hangzhou",
-      "linkedAnomaly": "A5-50",
       "choices": [
         {
           "label": "参与处置",
@@ -846,7 +879,8 @@ export const HZ_STATE = {
       72,
       73.2,
       71.1,
-      69.7
+      69.7,
+      71
     ],
     "peakGrid": [
       56,
@@ -855,7 +889,8 @@ export const HZ_STATE = {
       64,
       61,
       72,
-      57
+      57,
+      60
     ],
     "syncRate": [
       99.6,
@@ -864,6 +899,7 @@ export const HZ_STATE = {
       97.6,
       98,
       98,
+      97.2,
       97.2
     ]
   },
@@ -871,28 +907,28 @@ export const HZ_STATE = {
     {
       "id": "pop",
       "name": "人口目标(逼近2076规划)",
-      "metric": "全市模拟人口 1611.3 万",
+      "metric": "全市模拟人口 1632 万",
       "target": "进度随 simYear",
       "status": "进行中"
     },
     {
       "id": "mood",
       "name": "宜居情绪 ≥ 68",
-      "metric": "全市平均 69.7",
+      "metric": "全市平均 71.0",
       "target": "68",
       "status": "达标"
     },
     {
       "id": "traffic",
       "name": "交通峰值可控 ≤ 88",
-      "metric": "峰值 94",
+      "metric": "峰值 96",
       "target": "88",
       "status": "失守"
     },
     {
       "id": "grid",
       "name": "能源韧性(电网峰值 ≤ 95)",
-      "metric": "峰值 57",
+      "metric": "峰值 60",
       "target": "95",
       "status": "达标"
     },
@@ -905,15 +941,15 @@ export const HZ_STATE = {
     },
     {
       "id": "renew",
-      "name": "可再生能源占比(阶段≥45)",
-      "metric": "全市平均 75%",
-      "target": "45%",
+      "name": "可再生能源占比(阶段≥48)",
+      "metric": "全市平均 77%",
+      "target": "48%",
       "status": "达标"
     },
     {
       "id": "carbon",
       "name": "零碳进程(碳强度↓)",
-      "metric": "碳指数 35.2",
+      "metric": "碳指数 33.3",
       "target": "随年下降",
       "status": "达标"
     }
